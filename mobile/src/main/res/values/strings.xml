@@ -29,6 +29,6 @@
         &lt;html&gt;Version &lt;b&gt;%1$s&lt;/b&gt; by &lt;i&gt;rycus86&lt;/i&gt;&lt;/html&gt;
     </string>
     <string name="about_notice">Click for issues or suggestions</string>
-    <string name="about_link">https://github.com/rycus86/tweetwear/issues</string>
+    <string name="about_link">https://github.com/rycus86/TweetWear/issues</string>
 
 </resources>
