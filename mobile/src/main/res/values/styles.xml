@@ -1,0 +1,16 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="ItemTitle" parent="android:TextAppearance.DeviceDefault.Medium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ItemDescription" parent="android:TextAppearance.DeviceDefault.Medium">
+
+    </style>
+
+</resources>

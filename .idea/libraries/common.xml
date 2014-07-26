@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="common">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/common/build/outputs/aar/common.aar" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

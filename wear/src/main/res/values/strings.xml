@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <plurals name="summary_notification">
+        <item quantity="zero">No new tweets</item>
+        <item quantity="one">1 new tweet</item>
+        <item quantity="other">%d new tweets</item>
+    </plurals>
+
+</resources>
