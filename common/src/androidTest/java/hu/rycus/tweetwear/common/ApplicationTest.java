@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common;
+package hu.rycus.tweetwear.common;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

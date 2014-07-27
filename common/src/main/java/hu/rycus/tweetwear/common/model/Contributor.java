@@ -1,6 +1,7 @@
-package hu.rycus.rtweetwear.common.model.entities;
+package hu.rycus.tweetwear.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,10 +11,11 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Hashtag {
+public class Contributor {
 
-    private int[] indices;
+    private long id;
 
-    private String text;
+    @JsonProperty("screen_name")
+    private String screenName;
 
 }

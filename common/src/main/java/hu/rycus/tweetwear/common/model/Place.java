@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common.model;
+package hu.rycus.tweetwear.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

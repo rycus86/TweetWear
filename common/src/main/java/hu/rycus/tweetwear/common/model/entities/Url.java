@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common.model;
+package hu.rycus.tweetwear.common.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,11 +11,15 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AccountSettings {
+public class Url {
 
-    @JsonProperty("screen_name")
-    private String screenName;
+    private String url;
+    private int[] indices;
 
-    private String language;
+    @JsonProperty("display_url")
+    private String displayUrl;
+
+    @JsonProperty("expanded_url")
+    private String expandedUrl;
 
 }

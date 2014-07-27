@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common.model;
+package hu.rycus.tweetwear.common.model.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,13 +11,15 @@ import lombok.ToString;
 @Setter
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User {
+public class Entities {
 
-    private long id;
+    private Hashtag[] hashtags;
 
-    private String name;
+    private Media[] media;
 
-    @JsonProperty("screen_name")
-    private String screenName;
+    private Url[] urls;
+
+    @JsonProperty("user_mentions")
+    private UserMention[] userMentions;
 
 }

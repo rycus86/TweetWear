@@ -5,3 +5,5 @@
 /build
 /api.properties
 /signed
+/bump_version.sh
+/change_version.sh

@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common.util;
+package hu.rycus.tweetwear.common.util;
 
 import android.util.Log;
 

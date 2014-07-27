@@ -1,4 +1,4 @@
-package hu.rycus.rtweetwear.common.model;
+package hu.rycus.tweetwear.common.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
-import hu.rycus.rtweetwear.common.model.entities.Entities;
+import hu.rycus.tweetwear.common.model.entities.Entities;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
