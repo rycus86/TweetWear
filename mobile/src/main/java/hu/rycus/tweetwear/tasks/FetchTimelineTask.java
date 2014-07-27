@@ -22,9 +22,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
-import hu.rycus.rtweetwear.common.model.Tweet;
-import hu.rycus.rtweetwear.common.util.Constants;
-import hu.rycus.rtweetwear.common.util.Mapper;
+import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.Mapper;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;

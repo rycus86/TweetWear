@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import hu.rycus.rtweetwear.common.model.Tweet;
-import hu.rycus.rtweetwear.common.util.Constants;
-import hu.rycus.rtweetwear.common.util.Mapper;
+import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.Mapper;
 
 public class ClearExistingTweetsTask extends AsyncTask<Void, Void, Void> {
 

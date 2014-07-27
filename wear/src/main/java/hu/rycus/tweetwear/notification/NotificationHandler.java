@@ -8,11 +8,11 @@ import android.text.Spanned;
 
 import java.text.DateFormat;
 
-import hu.rycus.rtweetwear.common.model.Tweet;
-import hu.rycus.rtweetwear.common.model.entities.Hashtag;
-import hu.rycus.rtweetwear.common.model.entities.Media;
-import hu.rycus.rtweetwear.common.model.entities.Url;
-import hu.rycus.rtweetwear.common.model.entities.UserMention;
+import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.model.entities.Hashtag;
+import hu.rycus.tweetwear.common.model.entities.Media;
+import hu.rycus.tweetwear.common.model.entities.Url;
+import hu.rycus.tweetwear.common.model.entities.UserMention;
 import hu.rycus.tweetwear.R;
 
 public class NotificationHandler {

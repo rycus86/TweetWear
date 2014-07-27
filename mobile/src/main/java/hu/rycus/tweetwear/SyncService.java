@@ -12,7 +12,7 @@ import android.util.Log;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
 
-import hu.rycus.rtweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.tasks.ClearExistingTweetsTask;
 import hu.rycus.tweetwear.tasks.FetchTimelineTask;

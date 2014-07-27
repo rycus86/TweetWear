@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.scribe.model.Token;
 
-import hu.rycus.rtweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
 

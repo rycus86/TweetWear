@@ -8,7 +8,7 @@ import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
 
-import hu.rycus.rtweetwear.common.util.Mapper;
+import hu.rycus.tweetwear.common.util.Mapper;
 
 public class RequestBuilder {
 

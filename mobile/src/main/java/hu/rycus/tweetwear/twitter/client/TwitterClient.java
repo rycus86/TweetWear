@@ -8,7 +8,7 @@ import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import hu.rycus.rtweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.BuildConfig;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.async.AuthorizationTask;

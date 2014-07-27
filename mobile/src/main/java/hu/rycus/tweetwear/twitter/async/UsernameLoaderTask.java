@@ -7,7 +7,7 @@ import android.util.Log;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import hu.rycus.rtweetwear.common.model.AccountSettings;
+import hu.rycus.tweetwear.common.model.AccountSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 import hu.rycus.tweetwear.twitter.client.RequestBuilder;
