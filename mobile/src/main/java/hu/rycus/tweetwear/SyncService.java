@@ -67,14 +67,16 @@ public class SyncService extends Service {
 
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
-        if (Constants.ACTION_START_ALARM.equals(intent.getAction())) {
-            scheduleTask();
-        } else if (Constants.ACTION_CANCEL_ALARM.equals(intent.getAction())) {
-            cancelTask();
-        } else if (Constants.ACTION_START_SYNC.equals(intent.getAction())) {
-            requestFetchTimeline();
-        } else if (Constants.ACTION_CLEAR_EXISTING.equals(intent.getAction())) {
-            requestClearExistingTweets();
+        if (intent != null && intent.getAction() != null) {
+            if (Constants.ACTION_START_ALARM.equals(intent.getAction())) {
+                scheduleTask();
+            } else if (Constants.ACTION_CANCEL_ALARM.equals(intent.getAction())) {
+                cancelTask();
+            } else if (Constants.ACTION_START_SYNC.equals(intent.getAction())) {
+                requestFetchTimeline();
+            } else if (Constants.ACTION_CLEAR_EXISTING.equals(intent.getAction())) {
+                requestClearExistingTweets();
+            }
         }
 
         return super.onStartCommand(intent, flags, startId);
