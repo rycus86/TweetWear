@@ -115,9 +115,8 @@ public class FetchTimelineTask implements Runnable {
                     account.getAccessToken(),
                     tweetCountLimit, sinceId, null, null, null, null, null);
 
-            Log.d(TAG,
-                    String.format("Tweets retrieved for account (%s): %d",
-                            account.getUsername(), timelineTweets.length));
+            Log.d(TAG, String.format("Tweets retrieved for account (%s): %d",
+                    account.getUsername(), timelineTweets.length));
 
             tweets.addAll(Arrays.asList(timelineTweets));
         }

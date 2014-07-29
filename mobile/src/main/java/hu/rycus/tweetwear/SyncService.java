@@ -76,7 +76,11 @@ public class SyncService extends Service {
                 requestFetchTimeline();
             } else if (Constants.ACTION_CLEAR_EXISTING.equals(intent.getAction())) {
                 requestClearExistingTweets();
+            } else {
+                return super.onStartCommand(intent, flags, startId);
             }
+
+            return START_REDELIVER_INTENT;
         }
 
         return super.onStartCommand(intent, flags, startId);

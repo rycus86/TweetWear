@@ -51,7 +51,7 @@ public class TwitterClient implements ITwitterClient {
             final Boolean includeEntities) {
 
         try {
-            return RequestBuilder.start(Uri.TIMELINE.get())
+            final Tweet[] timelineTweets = RequestBuilder.start(Uri.TIMELINE.get())
                     .param(Parameter.COUNT.get(), count)
                     .param(Parameter.SINCE_ID.get(), sinceId)
                     .param(Parameter.MAX_ID.get(), maxId)
@@ -61,6 +61,10 @@ public class TwitterClient implements ITwitterClient {
                     .param(Parameter.INCLUDE_ENTITIES.get(), includeEntities)
                     .get(service, accessToken)
                     .respond(Tweet[].class);
+
+            if (timelineTweets != null) {
+                return timelineTweets;
+            }
         } catch (Exception ex) {
             Log.e(TAG, "Failed to retrieve tweets for timeline", ex);
         }
