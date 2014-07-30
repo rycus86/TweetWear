@@ -16,7 +16,7 @@ import lombok.ToString;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Place {
 
-    private long id;
+    private String id;
 
     private final Map<String, String> attributes = new HashMap<String, String>();
 
