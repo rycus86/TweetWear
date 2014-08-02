@@ -1,19 +1,9 @@
 package hu.rycus.tweetwear.tasks;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.data.FreezableUtils;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataItemBuffer;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.PutDataMapRequest;
-import com.google.android.gms.wearable.PutDataRequest;
-import com.google.android.gms.wearable.Wearable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,21 +12,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
+import hu.rycus.tweetwear.common.api.ApiClientHelper;
+import hu.rycus.tweetwear.common.api.ApiClientRunnable;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
-import hu.rycus.tweetwear.common.util.Mapper;
+import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
-public class FetchTimelineTask implements Runnable {
+public class FetchTimelineTask extends ApiClientRunnable {
 
     private static final String TAG = FetchTimelineTask.class.getSimpleName();
 
     private static final int DEFAULT_TWEET_LIMIT = 10;
 
-    private final Context context;
-    private final GoogleApiClient apiClient;
     private final IAccountProvider accountProvider;
     private final ITwitterClient client;
 
@@ -47,68 +37,39 @@ public class FetchTimelineTask implements Runnable {
 
     private int tweetCountLimit = DEFAULT_TWEET_LIMIT;
 
-    private final ResultCallback<DataApi.DataItemResult> sendCallback =
-            new ResultCallback<DataApi.DataItemResult>() {
-                @Override
-                public void onResult(final DataApi.DataItemResult dataItemResult) {
-                    if (!dataItemResult.getStatus().isSuccess()) {
-                        Log.e(TAG, String.format("Failed to send message [%s]: %s",
-                                dataItemResult.getDataItem().getUri(),
-                                dataItemResult.getStatus()));
-                    }
-                }
-            };
-
-    public FetchTimelineTask(final Context context,
-                             final GoogleApiClient apiClient,
-                             final IAccountProvider accountProvider,
-                             final ITwitterClient client) {
-        this.context = context;
-        this.apiClient = apiClient;
+    public FetchTimelineTask(final IAccountProvider accountProvider, final ITwitterClient client) {
         this.accountProvider = accountProvider;
         this.client = client;
     }
 
     @Override
-    public void run() {
-        try {
-            if (!checkIfApiClientIsConnected()) return;
+    protected void run(final Context context, final GoogleApiClient apiClient) throws Exception {
+        loadExistingTweets(apiClient);
+        loadNewTweets(context);
 
-            loadExistingTweets();
-            loadNewTweets();
-
-            if (!newTweets.isEmpty()) {
-                for (final Tweet tweet : newTweets) {
-                    sendTweet(tweet);
-                }
-
-                final Collection<Tweet> toRemove = getTweetsToRemove();
-                if (!toRemove.isEmpty()) {
-                    Log.d(TAG, String.format("About to remove %d tweets, existing: %d, new: %d",
-                            toRemove.size(), existingTweets.size(), newTweets.size()));
-
-                    for (final Tweet tweet : toRemove) {
-                        removeOldTweet(tweet);
-                    }
-                }
-            } else {
-                Log.d(TAG, "There are no tweets to send at this time");
+        if (!newTweets.isEmpty()) {
+            for (final Tweet tweet : newTweets) {
+                TweetData.of(tweet).sendBlocking(apiClient);
             }
-        } finally {
-            apiClient.disconnect();
-        }
-    }
 
-    protected boolean checkIfApiClientIsConnected() {
-        if (apiClient.isConnected()) {
-            return true;
+            final Collection<Tweet> toRemove = getTweetsToRemove();
+            if (!toRemove.isEmpty()) {
+                Log.d(TAG, String.format("About to remove %d tweets, existing: %d, new: %d",
+                        toRemove.size(), existingTweets.size(), newTweets.size()));
+
+                for (final Tweet tweet : toRemove) {
+                    TweetData.of(tweet).deleteBlocking(apiClient);
+                }
+            }
+
+            ApiClientHelper.sendMessageToConnectedNode(
+                    apiClient, Constants.DataPath.SYNC_COMPLETE.get(), null);
         } else {
-            Log.e(TAG, "Google API client is not connected");
-            return false;
+            Log.d(TAG, "There are no tweets to send at this time");
         }
     }
 
-    protected void loadNewTweets() {
+    protected void loadNewTweets(final Context context) {
         final TreeSet<Tweet> tweets = new TreeSet<Tweet>();
         for (final Account account : accountProvider.getAccounts(context)) {
             final Tweet[] timelineTweets = client.getTimeline(
@@ -124,47 +85,9 @@ public class FetchTimelineTask implements Runnable {
         setNewTweets(tweets);
     }
 
-    protected void sendTweet(final Tweet tweet) {
-        if (!checkIfApiClientIsConnected()) return;
-
-        final PutDataMapRequest mapRequest = PutDataMapRequest.create(
-                Constants.DataPath.TWEETS.withId(tweet.getId()));
-        mapRequest.getDataMap().putByteArray(
-                Constants.DataKey.CONTENT.get(),
-                Mapper.writeObject(tweet));
-        final PutDataRequest request = mapRequest.asPutDataRequest();
-        Wearable.DataApi
-                .putDataItem(apiClient, request)
-                .setResultCallback(sendCallback);
-    }
-
-    protected void loadExistingTweets() {
-        if (!checkIfApiClientIsConnected()) {
-            setExistingTweets(Collections.<Tweet>emptyList());
-        }
-
-        final DataItemBuffer buffer = Wearable.DataApi.getDataItems(apiClient).await();
-        try {
-            if (buffer.getStatus().isSuccess()) {
-                final List<Tweet> tweets = new ArrayList<Tweet>(buffer.getCount());
-                for (final DataItem item : FreezableUtils.freezeIterable(buffer)) {
-                    final DataMapItem mapItem = DataMapItem.fromDataItem(item);
-                    final String path = mapItem.getUri().getPath();
-                    if (path.matches(Constants.DataPath.TWEETS.pattern())) {
-                        final byte[] content = mapItem.getDataMap().getByteArray(
-                                Constants.DataKey.CONTENT.get());
-
-                        final Tweet tweet = Mapper.readObject(content, Tweet.class);
-                        tweets.add(tweet);
-                    }
-                }
-                setExistingTweets(tweets);
-            } else {
-                setExistingTweets(Collections.<Tweet>emptyList());
-            }
-        } finally {
-            buffer.release();
-        }
+    protected void loadExistingTweets(final GoogleApiClient apiClient) {
+        final Collection<Tweet> tweets = TweetData.loadAll(apiClient);
+        setExistingTweets(tweets);
     }
 
     protected Collection<Tweet> getTweetsToRemove() {
@@ -176,24 +99,6 @@ public class FetchTimelineTask implements Runnable {
             final int toRemove = existingTweets.size() + newTweets.size() - tweetCountLimit;
             return candidates.subList(0, Math.max(0, toRemove));
         }
-    }
-
-    protected void removeOldTweet(final Tweet tweet) {
-        if (!checkIfApiClientIsConnected()) return;
-
-        Wearable.DataApi.deleteDataItems(apiClient,
-                new Uri.Builder()
-                        .scheme(PutDataRequest.WEAR_URI_SCHEME)
-                        .path(Constants.DataPath.TWEETS.withId(tweet.getId()))
-                        .build())
-                .setResultCallback(new ResultCallback<DataApi.DeleteDataItemsResult>() {
-            @Override
-            public void onResult(final DataApi.DeleteDataItemsResult deleteDataItemsResult) {
-                if (!deleteDataItemsResult.getStatus().isSuccess()) {
-                    Log.w(TAG, String.format("Failed to delete Tweet #%d", tweet.getId()));
-                }
-            }
-        });
     }
 
     protected void setTweetCountLimit(final int tweetCountLimit) {

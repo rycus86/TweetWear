@@ -66,6 +66,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="lombok-1.14.4" level="project" />
     <orderEntry type="library" exported="" name="jackson-annotations-2.4.0" level="project" />
+    <orderEntry type="library" exported="" name="play-services-wearable-5.0.77" level="project" />
+    <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="jackson-databind-2.4.1" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.4.1" level="project" />
   </component>

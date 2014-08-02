@@ -8,12 +8,26 @@ public interface Constants {
     String ACTION_CANCEL_ALARM = PACKAGE_NAME + ".CancelAlarm";
     String ACTION_START_SYNC = PACKAGE_NAME + ".StartSync";
     String ACTION_CLEAR_EXISTING = PACKAGE_NAME + ".ClearExisting";
+    String ACTION_TASK_RESULT = PACKAGE_NAME + ".TaskResult";
+    String ACTION_SEND_RETWEET = PACKAGE_NAME + ".SendRetweet";
+    String ACTION_SEND_FAVORITE = PACKAGE_NAME + ".SendFavorite";
+
+    String EXTRA_TWEET_ID = "__tweet_id";
+    String EXTRA_SUCCESS_FLAG = "__success";
+    String EXTRA_CONFIRMATION_MESSAGE = "__conf_message";
 
     String QUERY_PARAM_OAUTH_VERIFIER = "oauth_verifier";
 
     public enum DataPath {
 
-        TWEETS("/tweets/%");
+        SYNC_COMPLETE("/sync/complete"),
+        TWEETS("/tweets/%"),
+        RETWEET("/retweet/%"),
+        FAVORITE("/favorite/%"),
+        RESULT_RETWEET_SUCCESS("/retweet/%/success"),
+        RESULT_RETWEET_FAILURE("/retweet/%/failure"),
+        RESULT_FAVORITE_SUCCESS("/favorite/%/success"),
+        RESULT_FAVORITE_FAILURE("/favorite/%/failure");
 
         private final String value;
 
@@ -21,12 +35,24 @@ public interface Constants {
             this.value = value;
         }
 
+        public String get() {
+            return value;
+        }
+
         public String withId(final Object id) {
             return value.replace("%", id.toString());
         }
 
         public String pattern() {
-            return value.replace("%", "[^/]+");
+            return value.replace("%", "([^/]+)");
+        }
+
+        public boolean matches(final String value) {
+            return value != null && value.matches(pattern());
+        }
+
+        public String replace(final String value, final String replacement) {
+            return value.replaceFirst(pattern(), replacement);
         }
 
     }

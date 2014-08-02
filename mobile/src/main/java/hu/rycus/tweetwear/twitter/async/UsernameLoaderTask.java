@@ -38,8 +38,8 @@ public class UsernameLoaderTask extends AsyncTask<Token, Void, String> {
         try {
             final Token accessToken = params[0];
             final AccountSettings settings = RequestBuilder
-                    .start(ITwitterClient.Uri.SETTINGS.get())
-                    .get(service, accessToken)
+                    .get(ITwitterClient.Uri.SETTINGS.get())
+                    .send(service, accessToken)
                     .respond(AccountSettings.class);
             return settings.getScreenName();
         } catch (Exception ex) {

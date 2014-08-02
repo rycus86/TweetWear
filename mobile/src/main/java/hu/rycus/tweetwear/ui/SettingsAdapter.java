@@ -50,8 +50,9 @@ public class SettingsAdapter extends BaseAdapter {
         if (token != null) {
             items.add(new AccountItem(context));
             items.add(new RefreshItem(context));
+            items.add(new SyncNowItem());
             if (BuildConfig.DEBUG) {
-                items.add(new SyncNowItem());
+                items.add(new CreateDemoItem());
                 items.add(new ClearExistingItem());
             }
         } else {

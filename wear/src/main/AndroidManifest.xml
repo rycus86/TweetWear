@@ -21,8 +21,18 @@
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
-
         </service>
+
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
+
+        <receiver
+            android:name=".ActionResponseReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="hu.rycus.tweetwear.TaskResult" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

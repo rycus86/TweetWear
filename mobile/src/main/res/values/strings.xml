@@ -7,6 +7,7 @@
 
     <string name="loading_account">Loading account name&#8230;</string>
     <string name="error_account">Failed to load account name</string>
+    <string name="notice_access_token">Please renew your access token to use new features</string>
 
     <string name="refresh_title">Refresh interval</string>
     <string name="unknown_interval">Unknown interval</string>
@@ -21,6 +22,7 @@
     </array>
 
     <string name="sync_now">Check for new Tweets now</string>
+    <string name="sync_demo">Create a demo Tweet</string>
     <string name="clear_existing">Clear existing Tweets</string>
 
     <string name="error_authorization">Failed to request authorization</string>

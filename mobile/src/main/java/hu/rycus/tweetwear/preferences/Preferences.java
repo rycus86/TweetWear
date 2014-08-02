@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 
 import org.scribe.model.Token;
 
+import hu.rycus.tweetwear.twitter.client.ITwitterClient;
+
 public class Preferences {
 
     private static final String PREFERENCES_NAME = "tweetwear";
@@ -15,6 +17,8 @@ public class Preferences {
 
     private static final String KEY_USER_TOKEN = "userToken.0";
     private static final String KEY_USER_SECRET = "userSecret.0";
+
+    private static final String KEY_ACCESS_LEVEL = "accessLevel";
 
     private static final String KEY_USER_NAME = "userName.0";
 
@@ -34,6 +38,13 @@ public class Preferences {
         return preferences.edit()
                 .putString(tokenKey, token.getToken())
                 .putString(secretKey, token.getSecret())
+                .commit();
+    }
+
+    public static boolean saveAccessLevel(final Context context, final String level) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.edit()
+                .putString(KEY_ACCESS_LEVEL, level)
                 .commit();
     }
 
@@ -69,6 +80,16 @@ public class Preferences {
         } else {
             return null;
         }
+    }
+
+    public static String getAccessLevel(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.getString(KEY_ACCESS_LEVEL, null);
+    }
+
+    public static boolean hasDesiredAccessLevel(final Context context) {
+        final String savedValue = getAccessLevel(context);
+        return ITwitterClient.AccessLevel.desired().matches(savedValue);
     }
 
     public static String getUserName(final Context context) {

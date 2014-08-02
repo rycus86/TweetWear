@@ -3,6 +3,12 @@
 
     <string name="app_name">TweetWear</string>
 
+    <string name="retweet">Retweet</string>
+    <string name="retweeted">Retweeted</string>
+
+    <string name="favorite">Favorite</string>
+    <string name="favorited">Favorited</string>
+
     <plurals name="summary_notification">
         <item quantity="zero">No new tweets</item>
         <item quantity="one">1 new tweet</item>

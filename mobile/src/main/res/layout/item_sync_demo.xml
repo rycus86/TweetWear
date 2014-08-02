@@ -6,17 +6,10 @@
     android:padding="@dimen/item_padding">
 
     <TextView
-        android:id="@+id/txt_account"
+        android:id="@+id/txt_sync_demo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/ItemTitle"/>
-
-    <TextView
-        android:id="@+id/txt_notice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="@string/notice_access_token"
+        android:text="@string/sync_demo"
         style="@style/ItemDescription"/>
 
 </LinearLayout >

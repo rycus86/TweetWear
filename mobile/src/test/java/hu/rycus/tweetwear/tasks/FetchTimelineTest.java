@@ -2,8 +2,7 @@ package hu.rycus.tweetwear.tasks;
 
 import android.content.Context;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.scribe.model.Token;
@@ -24,6 +23,7 @@ import hu.rycus.tweetwear.common.util.Mapper;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
+import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
 
@@ -36,8 +36,11 @@ public class FetchTimelineTest {
 
     private static List<Tweet> tweets;
 
+    private Context mockContext;
+    private MockTwitterClient mockClient;
+
     @BeforeClass
-    public static void testDeserialization() throws IOException {
+    public static void loadDemoTimeline() throws IOException {
         final InputStream inputStream =
                 FetchTimelineTest.class.getResourceAsStream("/demo_timeline.json");
         assertNotNull(inputStream);
@@ -49,6 +52,12 @@ public class FetchTimelineTest {
         FetchTimelineTest.tweets = Collections.unmodifiableList(tweets);
     }
 
+    @Before
+    public void setupMocks() {
+        mockContext = mock(Context.class);
+        mockClient = new MockTwitterClient();
+    }
+
     @Test
     public void preloadedListHasTheCorrectSize() {
         assertEquals(20, tweets.size());
@@ -56,7 +65,7 @@ public class FetchTimelineTest {
 
     @Test
     public void testMergingNewTweets() {
-        final FetchTimelineTask task = new FetchTimelineTask(null, null, null, null);
+        final FetchTimelineTask task = new FetchTimelineTask(null, null);
         task.setTweetCountLimit(10);
         task.setExistingTweets(tweets.subList(0, 10));
         task.setNewTweets(tweets.subList(10, 12));
@@ -73,25 +82,24 @@ public class FetchTimelineTest {
     @Test
     public void testLoadingNewTweets() {
         final int limit = 10;
-        final MockTwitterClient twitterClient = new MockTwitterClient();
 
-        final FetchTimelineTask task0 = createTask(twitterClient, limit);
+        final FetchTimelineTask task0 = createTask(limit);
 
-        twitterClient.addAvailableTweets(tweets.subList(0, 10));
+        mockClient.addAvailableTweets(tweets.subList(0, 10));
 
-        task0.loadNewTweets();
+        task0.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(0, 10), task0.getNewTweets());
 
-        final FetchTimelineTask task1 = createTask(twitterClient, limit);
+        final FetchTimelineTask task1 = createTask(limit);
         task1.setExistingTweets(task0.getNewTweets());
 
-        twitterClient.addAvailableTweets(tweets.subList(10, 15));
+        mockClient.addAvailableTweets(tweets.subList(10, 15));
 
-        task1.loadNewTweets();
+        task1.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(10, 15), task1.getNewTweets());
         assertOrderedEquals(tweets.subList(0, 5), task1.getTweetsToRemove());
 
-        final FetchTimelineTask task2 = createTask(twitterClient, limit);
+        final FetchTimelineTask task2 = createTask(limit);
         final Set<Tweet> combinedTweets = new HashSet<Tweet>();
         combinedTweets.addAll(task1.getNewTweets());
         combinedTweets.addAll(task1.getExistingTweets());
@@ -100,9 +108,9 @@ public class FetchTimelineTest {
 
         assertEquals(limit, combinedTweets.size());
 
-        twitterClient.addAvailableTweets(tweets.subList(15, 20));
+        mockClient.addAvailableTweets(tweets.subList(15, 20));
 
-        task2.loadNewTweets();
+        task2.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(15, 20), task2.getNewTweets());
         assertOrderedEquals(tweets.subList(5, 10), task2.getTweetsToRemove());
     }
@@ -110,21 +118,20 @@ public class FetchTimelineTest {
     @Test
     public void testLoadingNewTweetsLessThanLimit() {
         final int limit = 10;
-        final MockTwitterClient twitterClient = new MockTwitterClient();
 
-        final FetchTimelineTask task0 = createTask(twitterClient, limit);
+        final FetchTimelineTask task0 = createTask(limit);
 
-        twitterClient.addAvailableTweets(tweets.subList(0, 7));
+        mockClient.addAvailableTweets(tweets.subList(0, 7));
 
-        task0.loadNewTweets();
+        task0.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(0, 7), task0.getNewTweets());
 
-        final FetchTimelineTask task1 = createTask(twitterClient, limit);
+        final FetchTimelineTask task1 = createTask(limit);
         task1.setExistingTweets(task0.getNewTweets());
 
-        twitterClient.addAvailableTweets(tweets.subList(7, 12));
+        mockClient.addAvailableTweets(tweets.subList(7, 12));
 
-        task1.loadNewTweets();
+        task1.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(7, 12), task1.getNewTweets());
         assertOrderedEquals(tweets.subList(0, 2), task1.getTweetsToRemove());
     }
@@ -132,14 +139,13 @@ public class FetchTimelineTest {
     @Test
     public void testLoadingRemovesNothing() {
         final int limit = 10;
-        final MockTwitterClient twitterClient = new MockTwitterClient();
 
-        final FetchTimelineTask task = createTask(twitterClient, limit);
+        final FetchTimelineTask task = createTask(limit);
         task.setExistingTweets(tweets.subList(0, 2));
 
-        twitterClient.addAvailableTweets(tweets.subList(0, 5));
+        mockClient.addAvailableTweets(tweets.subList(0, 5));
 
-        task.loadNewTweets();
+        task.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(2, 5), task.getNewTweets());
         assertOrderedEquals(Collections.<Tweet>emptyList(), task.getTweetsToRemove());
     }
@@ -147,14 +153,13 @@ public class FetchTimelineTest {
     @Test
     public void testLoadingRemovesAndAddsNothing() {
         final int limit = 10;
-        final MockTwitterClient twitterClient = new MockTwitterClient();
 
-        final FetchTimelineTask task = createTask(twitterClient, limit);
+        final FetchTimelineTask task = createTask(limit);
         task.setExistingTweets(tweets.subList(0, 5));
 
-        twitterClient.addAvailableTweets(tweets.subList(0, 5));
+        mockClient.addAvailableTweets(tweets.subList(0, 5));
 
-        task.loadNewTweets();
+        task.loadNewTweets(mockContext);
         assertOrderedEquals(Collections.<Tweet>emptyList(), task.getNewTweets());
         assertOrderedEquals(Collections.<Tweet>emptyList(), task.getTweetsToRemove());
     }
@@ -167,17 +172,13 @@ public class FetchTimelineTest {
                 new TreeSet<T>(collection1), new TreeSet<T>(collection2));
     }
 
-    private FetchTimelineTask createTask(final MockTwitterClient twitterClient,
-                                         final int tweetCountLimit) {
-        final Context mockContext = mock(Context.class);
-        final GoogleApiClient mockApiClient = mock(GoogleApiClient.class);
+    private FetchTimelineTask createTask(final int tweetCountLimit) {
         final IAccountProvider mockProvider = mock(IAccountProvider.class);
         final Account mockAccount = mock(Account.class);
 
         when(mockProvider.getAccounts(mockContext)).thenReturn(Collections.singleton(mockAccount));
 
-        final FetchTimelineTask task = new FetchTimelineTask(
-                mockContext, mockApiClient, mockProvider, twitterClient);
+        final FetchTimelineTask task = new FetchTimelineTask(mockProvider, mockClient);
         task.setTweetCountLimit(tweetCountLimit);
 
         return task;
@@ -210,6 +211,16 @@ public class FetchTimelineTest {
         }
 
         @Override
+        public Tweet retweet(final Token accessToken, final long id, final Boolean trimUser) {
+            return null;
+        }
+
+        @Override
+        public Tweet favorite(final Token accessToken, final long id, final Boolean includeEntities) {
+            return null;
+        }
+
+        @Override
         public void authorize(final Context context) {
             throw new UnsupportedOperationException("This mock does not support authorization");
         }
@@ -222,6 +233,11 @@ public class FetchTimelineTest {
 
         @Override
         public void loadUsername(final Context context, final UsernameCallback callback) {
+            throw new UnsupportedOperationException("This mock does not support authorization");
+        }
+
+        @Override
+        public void checkAccessLevel(final Context context, final AccessLevelCallback callback) {
             throw new UnsupportedOperationException("This mock does not support authorization");
         }
 
