@@ -53,8 +53,7 @@ public class FavoriteAction {
     }
 
     private static int getIcon(final Context context, final Tweet tweet) {
-        // TODO getResource
-        return R.drawable.demo_favorite;
+        return R.drawable.ic_action_favorite;
     }
 
 }

@@ -29,13 +29,13 @@ public class MessageHandler {
             onSuccessfulRetweet(context, tweet);
         } else if (Constants.DataPath.RESULT_RETWEET_FAILURE.matches(path)) {
             Log.w(TAG, "Retweet failed");
-            broadcastTaskResult(context, false, "Failed to retweet");
+            broadcastTaskResult(context, false, context.getString(R.string.retweet_failed));
         } else if (Constants.DataPath.RESULT_FAVORITE_SUCCESS.matches(path)) {
             final Tweet tweet = TweetData.parse(messageEvent.getData());
             onSuccessfulFavorite(context, tweet);
         } else if (Constants.DataPath.RESULT_FAVORITE_FAILURE.matches(path)) {
             Log.w(TAG, "Favorite failed");
-            broadcastTaskResult(context, false, "Failed to favorite");
+            broadcastTaskResult(context, false, context.getString(R.string.favorite_failed));
         }
     }
 

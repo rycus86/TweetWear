@@ -53,8 +53,7 @@ public class RetweetAction {
     }
 
     private static int getIcon(final Context context, final Tweet tweet) {
-        // TODO getResource
-        return R.drawable.demo_retweet;
+        return R.drawable.ic_action_retweet;
     }
 
 }

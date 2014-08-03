@@ -5,9 +5,11 @@
 
     <string name="retweet">Retweet</string>
     <string name="retweeted">Retweeted</string>
+    <string name="retweet_failed">Retweet failed</string>
 
     <string name="favorite">Favorite</string>
     <string name="favorited">Favorited</string>
+    <string name="favorite_failed">Favorite failed</string>
 
     <plurals name="summary_notification">
         <item quantity="zero">No new tweets</item>
