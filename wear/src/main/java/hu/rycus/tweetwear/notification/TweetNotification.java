@@ -17,6 +17,7 @@ import hu.rycus.tweetwear.common.model.entities.Media;
 import hu.rycus.tweetwear.common.model.entities.Url;
 import hu.rycus.tweetwear.common.model.entities.UserMention;
 import hu.rycus.tweetwear.notification.action.FavoriteAction;
+import hu.rycus.tweetwear.notification.action.ReplyAction;
 import hu.rycus.tweetwear.notification.action.RetweetAction;
 
 public class TweetNotification {
@@ -52,9 +53,7 @@ public class TweetNotification {
                 .setSortKey(getSortKey(tweet))
                 .setStyle(new Notification.BigTextStyle().bigText(contentHtml))
                 .setGroup(NotificationConstants.Group.TWEETS.get())
-                .extend(new Notification.WearableExtender()
-                        .addAction(RetweetAction.build(context, tweet))
-                        .addAction(FavoriteAction.build(context, tweet)))
+                .extend(createActionExtender(context, tweet))
                 .build();
     }
     
@@ -80,7 +79,7 @@ public class TweetNotification {
 
         if (entities.getMedia() != null) {
             for (final Media media : entities.getMedia()) {
-                content = content.replace(media.getUrl(), ""); // TODO display media on a Page
+                content = content.replace(media.getUrl(), "");
             }
         }
 
@@ -121,6 +120,21 @@ public class TweetNotification {
 
     private static String getSortKey(final Tweet tweet) {
         return Long.toString(Long.MAX_VALUE - tweet.getId());
+    }
+
+    private static Notification.WearableExtender createActionExtender(final Context context,
+                                                                      final Tweet tweet) {
+
+        final Notification.WearableExtender extender = new Notification.WearableExtender();
+
+        if (!tweet.isOwnTweet()) {
+            extender.addAction(new RetweetAction().build(context, tweet));
+        }
+
+        extender.addAction(new FavoriteAction().build(context, tweet));
+        extender.addAction(new ReplyAction().build(context, tweet));
+
+        return extender;
     }
 
 }

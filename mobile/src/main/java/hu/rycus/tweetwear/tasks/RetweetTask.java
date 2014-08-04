@@ -39,6 +39,11 @@ public class RetweetTask extends ApiClientRunnable {
         if (tweet != null) {
             final Tweet retweeted = tweet.getRetweetedStatus();
 
+            /*
+             * we can not retweet our own tweets
+             * so no need to check if we created the original one
+             */
+
             Log.d(TAG, String.format("Retweet successful, retweet count: %d",
                     retweeted.getRetweetCount()));
 

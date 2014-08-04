@@ -5,6 +5,7 @@ import android.content.Context;
 import org.scribe.model.Token;
 
 import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
@@ -18,6 +19,8 @@ public interface ITwitterClient {
     void loadUsername(Context context, UsernameCallback callback);
 
     void checkAccessLevel(Context context, AccessLevelCallback callback);
+
+    User getUser(Token accessToken);
 
     Tweet[] getTimeline(
             Token accessToken,
@@ -33,13 +36,15 @@ public interface ITwitterClient {
 
     Tweet favorite(Token accessToken, long id, Boolean includeEntities);
 
+    Tweet postStatus(Token accessToken, String content, Long inReplyToStatusId);
+
     enum Uri {
 
         CALLBACK("tweetwear://oauth_callback"),
         TIMELINE("https://api.twitter.com/1.1/statuses/home_timeline.json"),
         RETWEET("https://api.twitter.com/1.1/statuses/retweet/%d.json"),
         FAVORITE("https://api.twitter.com/1.1/favorites/create.json"),
-        SETTINGS("https://api.twitter.com/1.1/account/settings.json"),
+        UPDATE_STATUS("https://api.twitter.com/1.1/statuses/update.json"),
         VERIFY_CREDENTIALS("https://api.twitter.com/1.1/account/verify_credentials.json");
 
         private final String uri;
@@ -67,7 +72,14 @@ public interface ITwitterClient {
         TRIM_USER("trim_user"),
         EXCLUDE_REPLIES("exclude_replies"),
         CONTRIBUTOR_DETAILS("contributor_details"),
-        INCLUDE_ENTITIES("include_entities");
+        INCLUDE_ENTITIES("include_entities"),
+        STATUS("status"),
+        IN_REPLY_TO_STATUS_ID("in_reply_to_status_id"),
+        POSSIBLY_SENSITIVE("possibly_sensitive"),
+        LATITUDE("lat"),
+        LONGITUDE("long"),
+        PLACE_ID("place_id"),
+        DISPLAY_COORDINATES("display_coordinates");
 
         private final String key;
 

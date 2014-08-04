@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import org.scribe.model.Token;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +19,7 @@ import hu.rycus.tweetwear.common.api.ApiClientRunnable;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
+import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
@@ -72,9 +75,13 @@ public class FetchTimelineTask extends ApiClientRunnable {
     protected void loadNewTweets(final Context context) {
         final TreeSet<Tweet> tweets = new TreeSet<Tweet>();
         for (final Account account : accountProvider.getAccounts(context)) {
+            final Token token = account.getAccessToken();
+            final long userId = TwitterFactory.getUserId(context, client, token);
+
             final Tweet[] timelineTweets = client.getTimeline(
-                    account.getAccessToken(),
-                    tweetCountLimit, sinceId, null, null, null, null, null);
+                    token, tweetCountLimit, sinceId, null, null, null, null, null);
+
+            markOwnTweets(userId, timelineTweets);
 
             Log.d(TAG, String.format("Tweets retrieved for account (%s): %d",
                     account.getUsername(), timelineTweets.length));
@@ -83,6 +90,12 @@ public class FetchTimelineTask extends ApiClientRunnable {
         }
 
         setNewTweets(tweets);
+    }
+
+    protected void markOwnTweets(final long userId, final Tweet[] tweets) {
+        for (final Tweet tweet : tweets) {
+            tweet.setOwnTweet(tweet.getUser().getId() == userId);
+        }
     }
 
     protected void loadExistingTweets(final GoogleApiClient apiClient) {

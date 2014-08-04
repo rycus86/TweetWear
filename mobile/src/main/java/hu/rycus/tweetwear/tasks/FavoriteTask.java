@@ -14,6 +14,7 @@ import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
+import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
 public class FavoriteTask extends ApiClientRunnable {
 
@@ -34,9 +35,15 @@ public class FavoriteTask extends ApiClientRunnable {
 
     private Tweet processFavorite(final Context context, final GoogleApiClient apiClient) {
         final Token accessToken = Preferences.getUserToken(context);
-        final Tweet tweet = TwitterFactory.createClient().favorite(accessToken, tweetId, null);
+        final ITwitterClient client = TwitterFactory.createClient();
+        final Tweet tweet = client.favorite(accessToken, tweetId, null);
 
         if (tweet != null) {
+            final long userId = TwitterFactory.getUserId(context, client, accessToken);
+            if (tweet.getUser().getId() == userId) {
+                tweet.setOwnTweet(true);
+            }
+
             Log.d(TAG, String.format("Favorite successful, favorite count: %d",
                     tweet.getFavoriteCount()));
 

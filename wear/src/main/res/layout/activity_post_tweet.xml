@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.wearable.view.CardScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/card_scroller"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#33CC99">
+
+    <android.support.wearable.view.CardFrame
+        android:id="@+id/card_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/prompt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/post_tweet_prompt"
+                    android:textStyle="italic"
+                    style="@style/TextAppearance.Wearable.Medium"/>
+
+                <android.support.wearable.view.CircledImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    app:circle_color="#0099CC"
+                    app:circle_radius="30dp"
+                    android:src="@drawable/ic_btn_prompt"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/main_content"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/txt_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    style="@style/TextAppearance.Wearable.Small"/>
+
+                <android.support.wearable.view.DelayedConfirmationView
+                    android:id="@+id/delayed_confirmation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/txt_content"
+                    android:layout_alignParentRight="true"
+                    app:circle_color="#0099CC"
+                    app:circle_border_color="#0022CC"
+                    app:circle_radius="30dp"
+                    app:circle_border_width="3dp"
+                    app:circle_radius_pressed="28dp"
+                    android:src="@drawable/ic_full_cancel"/>
+
+                <TextView
+                    android:id="@+id/txt_cancel_notice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/delayed_confirmation"
+                    android:textStyle="italic"
+                    android:textColor="@android:color/secondary_text_light_nodisable"
+                    android:text="@string/post_tweet_cancel"
+                    style="@style/TextAppearance.Wearable.Small"/>
+
+                <TextView
+                    android:id="@+id/txt_posting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/txt_cancel_notice"
+                    android:textStyle="italic"
+                    android:text="@string/post_tweet_posting"
+                    style="@style/TextAppearance.Wearable.Small"/>
+
+            </RelativeLayout>
+
+        </FrameLayout>
+
+    </android.support.wearable.view.CardFrame>
+
+</android.support.wearable.view.CardScrollView>

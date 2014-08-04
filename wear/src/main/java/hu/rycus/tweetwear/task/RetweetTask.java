@@ -23,7 +23,7 @@ public class RetweetTask extends ApiClientRunnable {
     protected void run(final Context context, final GoogleApiClient apiClient) throws Exception {
         final String path = Constants.DataPath.RETWEET.withId(tweetId);
         if (!ApiClientHelper.sendMessageToConnectedNode(apiClient, path, null)) {
-            Log.e(TAG, "Failed to send retweet");
+            Log.e(TAG, "Failed to send reply");
         }
     }
 

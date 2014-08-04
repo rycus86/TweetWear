@@ -5,10 +5,12 @@ import android.content.Context;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.scribe.model.Token;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,9 +25,6 @@ import hu.rycus.tweetwear.common.util.Mapper;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
-import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
-import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
-import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -55,7 +54,7 @@ public class FetchTimelineTest {
     @Before
     public void setupMocks() {
         mockContext = mock(Context.class);
-        mockClient = new MockTwitterClient();
+        mockClient = MockTwitterClientHandler.create();
     }
 
     @Test
@@ -184,20 +183,34 @@ public class FetchTimelineTest {
         return task;
     }
 
-    private class MockTwitterClient implements ITwitterClient {
+    private interface MockTwitterClient extends ITwitterClient {
+
+        void addAvailableTweets(final Collection<Tweet> tweets);
+
+    }
+
+    private static class MockTwitterClientHandler implements InvocationHandler {
 
         private final TreeSet<Tweet> availableTweets = new TreeSet<Tweet>();
+
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            if (method.getName().equals("getTimeline")) {
+                return getTimeline((Integer) args[1], (Long) args[2], (Long) args[3]);
+            } else if (method.getName().equals("addAvailableTweets")) {
+                @SuppressWarnings("unchecked")
+                Collection<Tweet> arguments = (Collection<Tweet>) args[0];
+                addAvailableTweets(arguments);
+            }
+
+            throw new UnsupportedOperationException("This mock does not support authorization");
+        }
 
         private void addAvailableTweets(final Collection<Tweet> tweets) {
             availableTweets.addAll(tweets);
         }
 
-        @Override
-        public Tweet[] getTimeline(final Token accessToken, final Integer count,
-                                   final Long sinceId, final Long maxId, final Boolean trimUser,
-                                   final Boolean excludeReplies, final Boolean contributorDetails,
-                                   final Boolean includeEntities) {
-
+        private Tweet[] getTimeline(final Integer count, final Long sinceId, final Long maxId) {
             final List<Tweet> tweets = new LinkedList<Tweet>();
             for (final Tweet tweet : availableTweets) {
                 if (maxId != null && maxId <= tweet.getId()) continue;
@@ -210,35 +223,11 @@ public class FetchTimelineTest {
             return tweets.toArray(new Tweet[tweets.size()]);
         }
 
-        @Override
-        public Tweet retweet(final Token accessToken, final long id, final Boolean trimUser) {
-            return null;
-        }
-
-        @Override
-        public Tweet favorite(final Token accessToken, final long id, final Boolean includeEntities) {
-            return null;
-        }
-
-        @Override
-        public void authorize(final Context context) {
-            throw new UnsupportedOperationException("This mock does not support authorization");
-        }
-
-        @Override
-        public void processAccessToken(final Context context, final String oauthVerifier,
-                                       final AccessTokenCallback callback) {
-            throw new UnsupportedOperationException("This mock does not support authorization");
-        }
-
-        @Override
-        public void loadUsername(final Context context, final UsernameCallback callback) {
-            throw new UnsupportedOperationException("This mock does not support authorization");
-        }
-
-        @Override
-        public void checkAccessLevel(final Context context, final AccessLevelCallback callback) {
-            throw new UnsupportedOperationException("This mock does not support authorization");
+        public static MockTwitterClient create() {
+            return (MockTwitterClient) Proxy.newProxyInstance(
+                    MockTwitterClient.class.getClassLoader(),
+                    new Class[] { MockTwitterClient.class },
+                    new MockTwitterClientHandler());
         }
 
     }

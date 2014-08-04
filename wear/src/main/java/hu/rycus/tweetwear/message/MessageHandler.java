@@ -1,11 +1,12 @@
 package hu.rycus.tweetwear.message;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
 
+import hu.rycus.tweetwear.FinishingConfirmationActivity;
+import hu.rycus.tweetwear.PostTweetActivity;
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.model.Tweet;
@@ -29,13 +30,27 @@ public class MessageHandler {
             onSuccessfulRetweet(context, tweet);
         } else if (Constants.DataPath.RESULT_RETWEET_FAILURE.matches(path)) {
             Log.w(TAG, "Retweet failed");
-            broadcastTaskResult(context, false, context.getString(R.string.retweet_failed));
+            FinishingConfirmationActivity.show(context, false, context.getString(R.string.retweet_failed));
         } else if (Constants.DataPath.RESULT_FAVORITE_SUCCESS.matches(path)) {
             final Tweet tweet = TweetData.parse(messageEvent.getData());
             onSuccessfulFavorite(context, tweet);
         } else if (Constants.DataPath.RESULT_FAVORITE_FAILURE.matches(path)) {
             Log.w(TAG, "Favorite failed");
-            broadcastTaskResult(context, false, context.getString(R.string.favorite_failed));
+            FinishingConfirmationActivity.show(context, false, context.getString(R.string.favorite_failed));
+        } else if (Constants.DataPath.RESULT_POST_NEW_TWEET_SUCCESS.matches(path)) {
+            final Tweet tweet = TweetData.parse(messageEvent.getData());
+            final String message = context.getString(R.string.post_tweet_successful_new_tweet);
+            onSuccessfulPost(context, tweet, message);
+        } else if (Constants.DataPath.RESULT_POST_REPLY_SUCCESS.matches(path)) {
+            final Tweet tweet = TweetData.parse(messageEvent.getData());
+            final String message = context.getString(R.string.post_tweet_successful_reply);
+            onSuccessfulPost(context, tweet, message);
+        } else if (Constants.DataPath.RESULT_POST_NEW_TWEET_FAILURE.matches(path)) {
+            final String message = context.getString(R.string.post_tweet_failure_new_tweet);
+            onFailedPost(context, message);
+        } else if (Constants.DataPath.RESULT_POST_REPLY_FAILURE.matches(path)) {
+            final String message = context.getString(R.string.post_tweet_failure_reply);
+            onFailedPost(context, message);
         }
     }
 
@@ -45,7 +60,7 @@ public class MessageHandler {
     }
 
     private static void onSuccessfulRetweet(final Context context, final Tweet tweet) {
-        broadcastTaskResult(context, true, context.getString(R.string.retweeted));
+        FinishingConfirmationActivity.show(context, true, context.getString(R.string.retweeted));
 
         Log.d(TAG, String.format("Retweet successful for @%s - %s",
                 tweet.getUser().getScreenName(), tweet.getText()));
@@ -54,7 +69,7 @@ public class MessageHandler {
     }
 
     private static void onSuccessfulFavorite(final Context context, final Tweet tweet) {
-        broadcastTaskResult(context, true, context.getString(R.string.favorited));
+        FinishingConfirmationActivity.show(context, true, context.getString(R.string.favorited));
 
         Log.d(TAG, String.format("Favorite successful for @%s - %s",
                 tweet.getUser().getScreenName(), tweet.getText()));
@@ -62,12 +77,24 @@ public class MessageHandler {
         TweetNotification.send(context, tweet);
     }
 
-    private static void broadcastTaskResult(final Context context,
-                                            final boolean success, final String message) {
-        final Intent intent = new Intent(Constants.ACTION_TASK_RESULT);
-        intent.putExtra(Constants.EXTRA_SUCCESS_FLAG, success);
-        intent.putExtra(Constants.EXTRA_CONFIRMATION_MESSAGE, message);
-        context.sendBroadcast(intent);
+    private static void onSuccessfulPost(final Context context, final Tweet tweet,
+                                         final String message) {
+
+        FinishingConfirmationActivity.show(context, true, message);
+        TweetNotification.send(context, tweet);
+
+        Log.d(TAG, String.format("Posting a tweet was successful: @%s - %s",
+                tweet.getUser().getScreenName(), tweet.getText()));
+
+        PostTweetActivity.notifyTaskFinished(context);
+    }
+
+    private static void onFailedPost(final Context context, final String message) {
+        FinishingConfirmationActivity.show(context, false, message);
+
+        Log.d(TAG, "Failed to post a tweet");
+
+        PostTweetActivity.notifyTaskFinished(context);
     }
 
 }

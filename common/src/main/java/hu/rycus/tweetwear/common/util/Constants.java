@@ -11,8 +11,10 @@ public interface Constants {
     String ACTION_TASK_RESULT = PACKAGE_NAME + ".TaskResult";
     String ACTION_SEND_RETWEET = PACKAGE_NAME + ".SendRetweet";
     String ACTION_SEND_FAVORITE = PACKAGE_NAME + ".SendFavorite";
+    String ACTION_CAPTURE_REPLY = PACKAGE_NAME + ".CaptureReply";
 
     String EXTRA_TWEET_ID = "__tweet_id";
+    String EXTRA_REPLY_TO_NAME = "__reply_to_name";
     String EXTRA_SUCCESS_FLAG = "__success";
     String EXTRA_CONFIRMATION_MESSAGE = "__conf_message";
 
@@ -24,10 +26,16 @@ public interface Constants {
         TWEETS("/tweets/%"),
         RETWEET("/retweet/%"),
         FAVORITE("/favorite/%"),
+        POST_NEW_TWEET("/post/new/tweet"),
+        POST_REPLY("/post/reply/%"),
         RESULT_RETWEET_SUCCESS("/retweet/%/success"),
         RESULT_RETWEET_FAILURE("/retweet/%/failure"),
         RESULT_FAVORITE_SUCCESS("/favorite/%/success"),
-        RESULT_FAVORITE_FAILURE("/favorite/%/failure");
+        RESULT_FAVORITE_FAILURE("/favorite/%/failure"),
+        RESULT_POST_NEW_TWEET_SUCCESS("/post/tweet/%/success"),
+        RESULT_POST_REPLY_SUCCESS("/post/reply/%/success"),
+        RESULT_POST_NEW_TWEET_FAILURE("/post/tweet/failure"),
+        RESULT_POST_REPLY_FAILURE("/post/reply/failure");
 
         private final String value;
 

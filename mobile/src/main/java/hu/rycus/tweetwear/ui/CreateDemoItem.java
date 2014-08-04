@@ -5,8 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.scribe.model.Token;
-
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -18,9 +19,6 @@ import hu.rycus.tweetwear.tasks.FetchTimelineTask;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
-import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
-import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
-import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
 
 public class CreateDemoItem extends SettingsItem<Void> {
 
@@ -37,7 +35,7 @@ public class CreateDemoItem extends SettingsItem<Void> {
     @Override
     protected void onClick(final Context context) {
         final IAccountProvider provider = new DemoAccountProvider();
-        final ITwitterClient twitterClient = new DemoTwitterClient();
+        final ITwitterClient twitterClient = DemoTwitterClient.create();
         ApiClientHelper.runAsynchronously(context, new FetchTimelineTask(provider, twitterClient));
     }
 
@@ -48,18 +46,24 @@ public class CreateDemoItem extends SettingsItem<Void> {
         }
     }
 
-    private class DemoTwitterClient implements ITwitterClient {
-        public void authorize(final Context context) {}
-        public void processAccessToken(final Context context, final String oauthVerifier, final AccessTokenCallback callback) {}
-        public void loadUsername(final Context context, final UsernameCallback callback) {}
-        public void checkAccessLevel(final Context context, final AccessLevelCallback callback) {}
-        public Tweet retweet(final Token accessToken, final long id, final Boolean trimUser) { return null; }
-        public Tweet favorite(final Token accessToken, final long id, final Boolean includeEntities) { return null; }
+    private static class DemoTwitterClient implements InvocationHandler {
 
         @Override
-        public Tweet[] getTimeline(final Token accessToken, final Integer count, final Long sinceId, final Long maxId, final Boolean trimUser, final Boolean excludeReplies, final Boolean contributorDetails, final Boolean includeEntities) {
-            return new Tweet[] { TweetData.demo(System.currentTimeMillis()) };
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            if (method.getName().equals("getTimeline")) {
+                return new Tweet[] { TweetData.demo(System.currentTimeMillis()) };
+            }
+
+            return null;
         }
+
+        public static ITwitterClient create() {
+            return (ITwitterClient) Proxy.newProxyInstance(
+                    DemoTwitterClient.class.getClassLoader(),
+                    new Class[] { ITwitterClient.class },
+                    new DemoTwitterClient());
+        }
+
     }
 
 }

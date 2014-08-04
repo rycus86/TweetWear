@@ -11,6 +11,20 @@
     <string name="favorited">Favorited</string>
     <string name="favorite_failed">Favorite failed</string>
 
+    <string name="reply_to">Reply to</string>
+
+    <string name="post_tweet_prompt">Say your Tweet when prompted</string>
+    <string name="post_tweet_label">New Tweet</string>
+    <string name="post_tweet_posting">Posting&#8230;</string>
+    <string name="post_tweet_cancel">Tap to cancel</string>
+    <string name="post_tweet_cancelled">Cancelled</string>
+    <string name="post_tweet_capture_failed">Failed</string>
+
+    <string name="post_tweet_failure_new_tweet">Failed to Tweet</string>
+    <string name="post_tweet_failure_reply">Failed to reply</string>
+    <string name="post_tweet_successful_new_tweet">Tweet posted</string>
+    <string name="post_tweet_successful_reply">Reply posted</string>
+
     <plurals name="summary_notification">
         <item quantity="zero">No new tweets</item>
         <item quantity="one">1 new tweet</item>

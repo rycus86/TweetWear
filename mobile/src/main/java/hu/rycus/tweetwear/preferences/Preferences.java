@@ -20,6 +20,7 @@ public class Preferences {
 
     private static final String KEY_ACCESS_LEVEL = "accessLevel";
 
+    private static final String KEY_USER_ID = "userId.0";
     private static final String KEY_USER_NAME = "userName.0";
 
     private static final String KEY_REFRESH_INTERVAL = "interval";
@@ -45,6 +46,13 @@ public class Preferences {
         final SharedPreferences preferences = getPreferences(context);
         return preferences.edit()
                 .putString(KEY_ACCESS_LEVEL, level)
+                .commit();
+    }
+
+    public static boolean saveUserId(final Context context, final long id) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.edit()
+                .putLong(KEY_USER_ID, id)
                 .commit();
     }
 
@@ -90,6 +98,11 @@ public class Preferences {
     public static boolean hasDesiredAccessLevel(final Context context) {
         final String savedValue = getAccessLevel(context);
         return ITwitterClient.AccessLevel.desired().matches(savedValue);
+    }
+
+    public static long getUserId(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.getLong(KEY_USER_ID, -1L);
     }
 
     public static String getUserName(final Context context) {

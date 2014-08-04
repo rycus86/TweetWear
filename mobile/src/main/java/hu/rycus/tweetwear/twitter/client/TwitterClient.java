@@ -8,13 +8,14 @@ import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.BuildConfig;
+import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.async.AuthorizationTask;
 import hu.rycus.tweetwear.twitter.async.CheckAccessLevelTask;
 import hu.rycus.tweetwear.twitter.async.ProcessAccessTokenTask;
-import hu.rycus.tweetwear.twitter.async.UsernameLoaderTask;
+import hu.rycus.tweetwear.twitter.async.UserInformationLoaderTask;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
@@ -42,7 +43,7 @@ public class TwitterClient implements ITwitterClient {
     @Override
     public void loadUsername(final Context context, final UsernameCallback callback) {
         final Token accessToken = Preferences.getUserToken(context);
-        final UsernameLoaderTask task = new UsernameLoaderTask(context, service, callback);
+        final UserInformationLoaderTask task = new UserInformationLoaderTask(context, service, callback);
         task.execute(accessToken);
     }
 
@@ -51,6 +52,20 @@ public class TwitterClient implements ITwitterClient {
         final Token accessToken = Preferences.getUserToken(context);
         final CheckAccessLevelTask task = new CheckAccessLevelTask(context, service, callback);
         task.execute(accessToken);
+    }
+
+    @Override
+    public User getUser(final Token accessToken) {
+        try {
+            return RequestBuilder
+                    .get(ITwitterClient.Uri.VERIFY_CREDENTIALS.get())
+                    .send(service, accessToken)
+                    .respond(User.class);
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to load user information");
+        }
+
+        return null;
     }
 
     @Override
@@ -113,7 +128,23 @@ public class TwitterClient implements ITwitterClient {
 
             return tweet;
         } catch (Exception ex) {
-            Log.e(TAG, "Failed to execute retweet", ex);
+            Log.e(TAG, "Failed to favorite a tweet", ex);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Tweet postStatus(final Token accessToken, final String content,
+                            final Long inReplyToStatusId) {
+        try {
+            return RequestBuilder.post(Uri.UPDATE_STATUS.get())
+                    .bodyParam(Parameter.STATUS.get(), content)
+                    .bodyParam(Parameter.IN_REPLY_TO_STATUS_ID.get(), inReplyToStatusId)
+                    .send(service, accessToken)
+                    .respond(Tweet.class);
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to post new tweet", ex);
         }
 
         return null;

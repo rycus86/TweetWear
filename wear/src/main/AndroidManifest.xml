@@ -8,11 +8,20 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.DeviceDefault" >
+        android:theme="@android:style/Theme.DeviceDefault.Light" >
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".PostTweetActivity" android:label="@string/post_tweet_label">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".FinishingConfirmationActivity" />
 
         <service
             android:name=".TweetWearService"
@@ -22,17 +31,6 @@
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
-
-        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
-
-        <receiver
-            android:name=".ActionResponseReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="hu.rycus.tweetwear.TaskResult" />
-            </intent-filter>
-        </receiver>
 
     </application>
 

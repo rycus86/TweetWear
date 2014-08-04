@@ -68,6 +68,9 @@ public class Tweet implements Comparable<Tweet> {
 
     private User user;
 
+    /** This field is not part of the official Twitter API. */
+    private boolean ownTweet;
+
     @Override
     public int compareTo(final Tweet another) {
         if (this.getId() > another.getId()) {
