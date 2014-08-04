@@ -57,6 +57,8 @@ public class PostTweetActivity extends Activity
     private final Runnable startRecognizerRunnable = new Runnable() {
         @Override
         public void run() {
+            if (isFinishing() || isDestroyed()) return;
+            
             startRecognition();
             handler.postDelayed(switchToMainContentRunnable, 500);
         }
