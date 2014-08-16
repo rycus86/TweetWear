@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="sign_in">Авторизоваться в Twitter</string>
+
+    <string name="loading_account">Загрузка имени пользователя&#8230;</string>
+    <string name="error_account">Ошибка загрузки имени пользователя</string>
+    <string name="notice_access_token">Пожалуйста, получите свежий маркер доступа для использования новых функций</string>
+
+    <string name="refresh_title">Частота обновления</string>
+    <string name="unknown_interval">Неизвестный интервал</string>
+    <array name="refresh_intervals">
+        <item>15 минут</item>
+        <item>30 минут</item>
+        <item>1 час</item>
+        <item>2 часа</item>
+        <item>3 часа</item>
+        <item>6 часов</item>
+        <item>12 часов</item>
+    </array>
+
+    <string name="sync_now">Запросить новые твиты</string>
+    <string name="sync_demo">Создать демонстрационный твит</string>
+    <string name="clear_existing">Очистить существующие твиты</string>
+
+    <string name="error_authorization">Ошибка при запросе авторизации</string>
+
+    <string name="about_version">
+        &lt;html&gt;Version &lt;b&gt;%1$s&lt;/b&gt; by &lt;i&gt;rycus86&lt;/i&gt;&lt;/html&gt;
+    </string>
+    <string name="about_notice">Нажмите для отправки предложения или сообщения об ошибке</string>
+    <string name="about_link">https://github.com/rycus86/TweetWear/issues</string>
+
+</resources>

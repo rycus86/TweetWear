@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="retweet">Ретвитнуть</string>
+    <string name="retweeted">Ретвит сделан</string>
+    <string name="retweet_failed">Ошибка ретвита</string>
+
+    <string name="favorite">В избранное</string>
+    <string name="favorited">Добавлено в избранное</string>
+    <string name="favorite_failed">Ошибка добавления</string>
+
+    <string name="reply_to">Ответить</string>
+
+    <string name="post_tweet_prompt">Произнесите текст при запросе</string>
+    <string name="post_tweet_label">Новый твит</string>
+    <string name="post_tweet_posting">Публикация&#8230;</string>
+    <string name="post_tweet_cancel">Отменить</string>
+    <string name="post_tweet_cancelled">Отменено</string>
+    <string name="post_tweet_capture_failed">Ошибка</string>
+
+    <string name="post_tweet_failure_new_tweet">Ошибка публикации</string>
+    <string name="post_tweet_failure_reply">Ответ не опубликован</string>
+    <string name="post_tweet_successful_new_tweet">Твит опубликован</string>
+    <string name="post_tweet_successful_reply">Ответ опубликован</string>
+
+    <plurals name="summary_notification">
+        <item quantity="zero">Новых твитов нет</item>
+        <item quantity="one">1 новых твитов</item>
+        <item quantity="other">%d новых твитов</item>
+    </plurals>
+
+</resources>
