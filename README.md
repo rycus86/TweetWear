@@ -9,3 +9,9 @@ Screenshots
 -----------
 
 ![Screenshot](https://raw.githubusercontent.com/rycus86/TweetWear/master/pics/wear_screenshot.png)
+
+Thanks
+------
+
+- Diego De Barbieri for Spanish translation
+- [Евгений Дрямин](https://github.com/bluegekkon) for Russian translation
