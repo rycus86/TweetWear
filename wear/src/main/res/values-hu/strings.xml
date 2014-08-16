@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="retweet">Megosztás</string>
+    <string name="retweeted">Megosztva</string>
+    <string name="retweet_failed">Nem sikerült megosztani</string>
+
+    <string name="favorite">Kedvenc</string>
+    <string name="favorited">Megjelölve</string>
+    <string name="favorite_failed">Nem sikerült megjelölni</string>
+
+    <string name="reply_to">Válasz</string>
+
+    <string name="post_tweet_prompt">Azonnal mondhatod az üzeneted</string>
+    <string name="post_tweet_label">Új Tweet</string>
+    <string name="post_tweet_posting">Küldés&#8230;</string>
+    <string name="post_tweet_cancel">Megszakítás</string>
+    <string name="post_tweet_cancelled">Megszakítva</string>
+    <string name="post_tweet_capture_failed">Meghiúsult</string>
+
+    <string name="post_tweet_failure_new_tweet">Nem sikerült elküldeni</string>
+    <string name="post_tweet_failure_reply">Nem sikerült válaszolni</string>
+    <string name="post_tweet_successful_new_tweet">Tweet elküldve</string>
+    <string name="post_tweet_successful_reply">Válasz elküldve</string>
+
+    <plurals name="summary_notification">
+        <item quantity="zero">Nincs új tweet</item>
+        <item quantity="one">1 új tweet</item>
+        <item quantity="other">%d új tweet</item>
+    </plurals>
+
+</resources>

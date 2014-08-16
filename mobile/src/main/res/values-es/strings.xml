@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="sign_in">Ingrese a su cuenta de Twitter</string>
+
+    <string name="loading_account">Cargando nombre de cuenta&#8230;</string>
+    <string name="error_account">Falló la carga de la cuenta</string>
+    <string name="notice_access_token">Por favor renueve su token de acceso para usar nuevas características</string>
+
+    <string name="refresh_title">Intervalo de refresco</string>
+    <string name="unknown_interval">Intervalo desconocido</string>
+    <array name="refresh_intervals">
+        <item>15 minutos</item>
+        <item>30 minuto</item>
+        <item>1 hora</item>
+        <item>2 horas</item>
+        <item>3 horas</item>
+        <item>6 horas</item>
+        <item>12 horas</item>
+    </array>
+
+    <string name="sync_now">Revisar nuevos Tweets</string>
+    <string name="sync_demo">Crear un Tweet de muestra</string>
+    <string name="clear_existing">Borrar Tweets existentes</string>
+
+    <string name="error_authorization">Falló en obtener la autorización</string>
+
+    <string name="about_version">
+        &lt;html&gt;Version &lt;b&gt;%1$s&lt;/b&gt; by &lt;i&gt;rycus86&lt;/i&gt;&lt;/html&gt;
+    </string>
+    <string name="about_notice">Haga click para problemas o sugerencias</string>
+    <string name="about_link">https://github.com/rycus86/TweetWear/issues</string>
+
+</resources>

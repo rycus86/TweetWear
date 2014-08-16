@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="retweet">Retweet</string>
+    <string name="retweeted">Retuiteado</string>
+    <string name="retweet_failed">Fallo Retweet</string>
+
+    <string name="favorite">Favorito</string>
+    <string name="favorited">Marcado como Favortio</string>
+    <string name="favorite_failed">Falló Favorito</string>
+
+    <string name="reply_to">Responder a</string>
+
+    <string name="post_tweet_prompt">Di tu Tweet cuando se indique</string>
+    <string name="post_tweet_label">Nuevo Tweet</string>
+    <string name="post_tweet_posting">Publicando&#8230;</string>
+    <string name="post_tweet_cancel">Cancelar</string>
+    <string name="post_tweet_cancelled">Cancelado</string>
+    <string name="post_tweet_capture_failed">Falló</string>
+
+    <string name="post_tweet_failure_new_tweet">Falló el Tweet</string>
+    <string name="post_tweet_failure_reply">Falló la respuesta</string>
+    <string name="post_tweet_successful_new_tweet">Tweet Publicado</string>
+    <string name="post_tweet_successful_reply">Respuesta Enviada</string>
+
+    <plurals name="summary_notification">
+        <item quantity="zero">No tiene nuevos Tweets</item>
+        <item quantity="one">1 nuevo tweet</item>
+        <item quantity="other">%d nuevos tweets</item>
+    </plurals>
+
+</resources>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TweetWear</string>
+
+    <string name="sign_in">Bejelentkezés a Twitter fiókodba</string>
+
+    <string name="loading_account">Fióknév beöltése&#8230;</string>
+    <string name="error_account">Nem sikerült betölteni a fióknevet</string>
+    <string name="notice_access_token">Kérlek újítsd meg a fiók engedélyeket az új funkciók használatához</string>
+
+    <string name="refresh_title">Frissítés gyakorisága</string>
+    <string name="unknown_interval">Ismeretlen</string>
+    <array name="refresh_intervals">
+        <item>15 perc</item>
+        <item>30 perc</item>
+        <item>1 óra</item>
+        <item>2 óra</item>
+        <item>3 óra</item>
+        <item>6 óra</item>
+        <item>12 óra</item>
+    </array>
+
+    <string name="sync_now">Szinkronizálás most</string>
+    <string name="sync_demo">Demó Tweet megjelenítése</string>
+    <string name="clear_existing">Korábbi Tweetek törlése</string>
+
+    <string name="error_authorization">Nem sikerült a bejelentkezés</string>
+
+    <string name="about_version">
+        &lt;html&gt;Verzió: &lt;b&gt;%1$s&lt;/b&gt; &#8212; &lt;i&gt;rycus86&lt;/i&gt;&lt;/html&gt;
+    </string>
+    <string name="about_notice">Hibák és javaslatok küldése</string>
+    <string name="about_link">https://github.com/rycus86/TweetWear/issues</string>
+
+</resources>
