@@ -6,5 +6,6 @@
 /build
 /api.properties
 /signed
+/keys
 /bump_version.sh
 /change_version.sh
