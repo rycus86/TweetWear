@@ -27,7 +27,7 @@
 
     <plurals name="summary_notification">
         <item quantity="zero">Новых твитов нет</item>
-        <item quantity="one">1 новых твитов</item>
+        <item quantity="one">1 новый твит</item>
         <item quantity="other">%d новых твитов</item>
     </plurals>
 
