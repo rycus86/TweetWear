@@ -14,8 +14,8 @@ android {
         applicationId "hu.rycus.tweetwear"
         minSdkVersion 18
         targetSdkVersion 20
-        versionCode 8
-        versionName "0.2.3"
+        versionCode 9
+        versionName "0.3.1"
     }
     buildTypes {
         debug {
