@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_header_account" android:order="10">
+
+        <Preference
+            android:key="ac_account_info"
+            android:persistent="false"
+            android:title="@string/sign_in"/>
+
+        <Preference
+            android:key="ac_account_lists"
+            android:persistent="false"
+            android:title="@string/pref_lists"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cat_sync"
+        android:persistent="false"
+        android:title="@string/pref_header_synchronization"
+        android:order="20">
+
+        <ListPreference
+            android:key="interval"
+            android:title="@string/refresh_title"
+            android:entries="@array/refresh_intervals"
+            android:entryValues="@array/refresh_interval_values"
+            android:defaultValue="@string/refresh_default_value"
+            android:dialogTitle="@string/pref_dialog_interval"/>
+
+        <Preference
+            android:key="ac_sync_now"
+            android:persistent="false"
+            android:title="@string/sync_now"/>
+
+        <Preference
+            android:key="ac_sync_demo"
+            android:persistent="false"
+            android:title="@string/sync_demo"/>
+
+        <Preference
+            android:key="ac_clear_existing"
+            android:persistent="false"
+            android:title="@string/clear_existing"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_header_about" android:order="30">
+
+        <Preference
+            android:key="ac_version_header"
+            android:persistent="false"
+            android:title="@string/about_version"
+            android:summary="@string/about_notice">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="@string/about_link"/>
+
+        </Preference>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

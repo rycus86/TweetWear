@@ -64,7 +64,7 @@ public class FetchTimelineTest {
 
     @Test
     public void testMergingNewTweets() {
-        final FetchTimelineTask task = new FetchTimelineTask(null, null);
+        final FetchTweetsTask task = new FetchTweetsTask(null, null);
         task.setTweetCountLimit(10);
         task.setExistingTweets(tweets.subList(0, 10));
         task.setNewTweets(tweets.subList(10, 12));
@@ -82,14 +82,14 @@ public class FetchTimelineTest {
     public void testLoadingNewTweets() {
         final int limit = 10;
 
-        final FetchTimelineTask task0 = createTask(limit);
+        final FetchTweetsTask task0 = createTask(limit);
 
         mockClient.addAvailableTweets(tweets.subList(0, 10));
 
         task0.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(0, 10), task0.getNewTweets());
 
-        final FetchTimelineTask task1 = createTask(limit);
+        final FetchTweetsTask task1 = createTask(limit);
         task1.setExistingTweets(task0.getNewTweets());
 
         mockClient.addAvailableTweets(tweets.subList(10, 15));
@@ -98,7 +98,7 @@ public class FetchTimelineTest {
         assertOrderedEquals(tweets.subList(10, 15), task1.getNewTweets());
         assertOrderedEquals(tweets.subList(0, 5), task1.getTweetsToRemove());
 
-        final FetchTimelineTask task2 = createTask(limit);
+        final FetchTweetsTask task2 = createTask(limit);
         final Set<Tweet> combinedTweets = new HashSet<Tweet>();
         combinedTweets.addAll(task1.getNewTweets());
         combinedTweets.addAll(task1.getExistingTweets());
@@ -118,14 +118,14 @@ public class FetchTimelineTest {
     public void testLoadingNewTweetsLessThanLimit() {
         final int limit = 10;
 
-        final FetchTimelineTask task0 = createTask(limit);
+        final FetchTweetsTask task0 = createTask(limit);
 
         mockClient.addAvailableTweets(tweets.subList(0, 7));
 
         task0.loadNewTweets(mockContext);
         assertOrderedEquals(tweets.subList(0, 7), task0.getNewTweets());
 
-        final FetchTimelineTask task1 = createTask(limit);
+        final FetchTweetsTask task1 = createTask(limit);
         task1.setExistingTweets(task0.getNewTweets());
 
         mockClient.addAvailableTweets(tweets.subList(7, 12));
@@ -139,7 +139,7 @@ public class FetchTimelineTest {
     public void testLoadingRemovesNothing() {
         final int limit = 10;
 
-        final FetchTimelineTask task = createTask(limit);
+        final FetchTweetsTask task = createTask(limit);
         task.setExistingTweets(tweets.subList(0, 2));
 
         mockClient.addAvailableTweets(tweets.subList(0, 5));
@@ -153,7 +153,7 @@ public class FetchTimelineTest {
     public void testLoadingRemovesAndAddsNothing() {
         final int limit = 10;
 
-        final FetchTimelineTask task = createTask(limit);
+        final FetchTweetsTask task = createTask(limit);
         task.setExistingTweets(tweets.subList(0, 5));
 
         mockClient.addAvailableTweets(tweets.subList(0, 5));
@@ -171,13 +171,13 @@ public class FetchTimelineTest {
                 new TreeSet<T>(collection1), new TreeSet<T>(collection2));
     }
 
-    private FetchTimelineTask createTask(final int tweetCountLimit) {
+    private FetchTweetsTask createTask(final int tweetCountLimit) {
         final IAccountProvider mockProvider = mock(IAccountProvider.class);
         final Account mockAccount = mock(Account.class);
 
         when(mockProvider.getAccounts(mockContext)).thenReturn(Collections.singleton(mockAccount));
 
-        final FetchTimelineTask task = new FetchTimelineTask(mockProvider, mockClient);
+        final FetchTweetsTask task = new FetchTweetsTask(mockProvider, mockClient);
         task.setTweetCountLimit(tweetCountLimit);
 
         return task;

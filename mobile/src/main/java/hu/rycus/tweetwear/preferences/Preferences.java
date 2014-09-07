@@ -10,7 +10,7 @@ import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
 public class Preferences {
 
-    private static final String PREFERENCES_NAME = "tweetwear";
+    public static final String PREFERENCES_NAME = "tweetwear";
 
     private static final String KEY_API_TOKEN = "apiToken";
     private static final String KEY_API_SECRET = "apiSecret";
@@ -24,6 +24,8 @@ public class Preferences {
     private static final String KEY_USER_NAME = "userName.0";
 
     private static final String KEY_REFRESH_INTERVAL = "interval";
+
+    private static final String KEY_LIST_SETTINGS = "listSettings.0";
 
     public static boolean saveRequestToken(final Context context, final Token token) {
         return saveToken(context, token, KEY_API_TOKEN, KEY_API_SECRET);
@@ -64,9 +66,17 @@ public class Preferences {
     }
 
     public static boolean setRefreshInterval(final Context context, final long interval) {
+        // the actual value has to be a string so it plays nice with PreferenceActivity
         final SharedPreferences preferences = getPreferences(context);
         return preferences.edit()
-                .putLong(KEY_REFRESH_INTERVAL, interval)
+                .putString(KEY_REFRESH_INTERVAL, Long.toString(interval))
+                .commit();
+    }
+
+    public static boolean saveListSettings(final Context context, final ListSettings settings) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.edit()
+                .putString(KEY_LIST_SETTINGS, settings.serialize())
                 .commit();
     }
 
@@ -111,8 +121,22 @@ public class Preferences {
     }
 
     public static long getRefreshInterval(final Context context) {
+        // the actual value has to be a string so it plays nice with PreferenceActivity
         final SharedPreferences preferences = getPreferences(context);
-        return preferences.getLong(KEY_REFRESH_INTERVAL, AlarmManager.INTERVAL_HALF_HOUR);
+        final String stringValue = preferences.getString(
+                KEY_REFRESH_INTERVAL,
+                Long.toString(AlarmManager.INTERVAL_HALF_HOUR));
+        return Long.parseLong(stringValue);
+    }
+
+    public static ListSettings getListSettings(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        final String stringValue = preferences.getString(KEY_LIST_SETTINGS, null);
+        if (stringValue != null) {
+            return ListSettings.create(stringValue);
+        } else {
+            return new ListSettings();
+        }
     }
 
     private static SharedPreferences getPreferences(final Context context) {

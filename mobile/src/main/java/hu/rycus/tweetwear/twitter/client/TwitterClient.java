@@ -9,9 +9,11 @@ import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
 import hu.rycus.tweetwear.BuildConfig;
+import hu.rycus.tweetwear.common.model.Lists;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.async.AuthorizationTask;
 import hu.rycus.tweetwear.twitter.async.CheckAccessLevelTask;
 import hu.rycus.tweetwear.twitter.async.ProcessAccessTokenTask;
@@ -57,6 +59,10 @@ public class TwitterClient implements ITwitterClient {
     @Override
     public User getUser(final Token accessToken) {
         try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
             return RequestBuilder
                     .get(ITwitterClient.Uri.VERIFY_CREDENTIALS.get())
                     .send(service, accessToken)
@@ -75,6 +81,10 @@ public class TwitterClient implements ITwitterClient {
             final Boolean includeEntities) {
 
         try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
             final Tweet[] timelineTweets = RequestBuilder.get(Uri.TIMELINE.get())
                     .queryParam(Parameter.COUNT.get(), count)
                     .queryParam(Parameter.SINCE_ID.get(), sinceId)
@@ -99,6 +109,10 @@ public class TwitterClient implements ITwitterClient {
     @Override
     public Tweet retweet(final Token accessToken, final long id, final Boolean trimUser) {
         try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
             return RequestBuilder.post(Uri.RETWEET.format(id))
                     .bodyParam(Parameter.TRIM_USER.get(), trimUser)
                     .send(service, accessToken)
@@ -113,6 +127,10 @@ public class TwitterClient implements ITwitterClient {
     @Override
     public Tweet favorite(final Token accessToken, final long id, final Boolean includeEntities) {
         try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
             final Tweet tweet = RequestBuilder.post(Uri.FAVORITE.get())
                     .bodyParam(Parameter.ID.get(), id)
                     .bodyParam(Parameter.INCLUDE_ENTITIES.get(), includeEntities)
@@ -138,6 +156,10 @@ public class TwitterClient implements ITwitterClient {
     public Tweet postStatus(final Token accessToken, final String content,
                             final Long inReplyToStatusId) {
         try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
             return RequestBuilder.post(Uri.UPDATE_STATUS.get())
                     .bodyParam(Parameter.STATUS.get(), content)
                     .bodyParam(Parameter.IN_REPLY_TO_STATUS_ID.get(), inReplyToStatusId)
@@ -148,6 +170,76 @@ public class TwitterClient implements ITwitterClient {
         }
 
         return null;
+    }
+
+    @Override
+    public Lists getLists(final Context context, final ListType listType,
+                          final Long cursor, final Integer count) {
+        switch (listType) {
+            case SUBSCRIPTIONS:
+                return getLists(context, Uri.LIST_SUBSCRIPTIONS, cursor, count);
+            case OWNERSHIPS:
+                return getLists(context, Uri.LIST_OWNERSHIPS, cursor, count);
+            default:
+                Log.wtf(TAG, "Unexpected list type: " + listType);
+                return null;
+        }
+    }
+
+    private Lists getLists(final Context context, final Uri uri,
+                           final Long cursor, final Integer count) {
+        final Token accessToken = Preferences.getUserToken(context);
+        try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
+            final long userId = TwitterFactory.getUserId(context, this, accessToken);
+            if (userId < 0) {
+                throw new IllegalArgumentException("No user ID found");
+            }
+
+            return RequestBuilder.get(uri.get())
+                    .queryParam(Parameter.USER_ID.get(), userId)
+                    .queryParam(Parameter.CURSOR.get(), cursor)
+                    .queryParam(Parameter.COUNT.get(), count)
+                    .send(service, accessToken)
+                    .respond(Lists.class);
+        } catch (Exception ex) {
+            Log.e(TAG, "Failed to get lists", ex);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Tweet[] getListStatuses(
+            final Token accessToken,
+            final long listId, final Integer count, final Long sinceId, final Long maxId,
+            final Boolean includeEntities, final Boolean includeRTs) {
+        try {
+            if (accessToken == null) {
+                throw new IllegalArgumentException("No access token present");
+            }
+
+            final Tweet[] listTweets = RequestBuilder.get(Uri.LIST_STATUSES.get())
+                    .queryParam(Parameter.LIST_ID.get(), listId)
+                    .queryParam(Parameter.COUNT.get(), count)
+                    .queryParam(Parameter.SINCE_ID.get(), sinceId)
+                    .queryParam(Parameter.MAX_ID.get(), maxId)
+                    .queryParam(Parameter.INCLUDE_ENTITIES.get(), includeEntities)
+                    .queryParam(Parameter.INCLUDE_RTS.get(), includeRTs)
+                    .send(service, accessToken)
+                    .respond(Tweet[].class);
+
+            if (listTweets != null) {
+                return listTweets;
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, String.format("Failed to retrieve tweets for list #%d", listId), ex);
+        }
+
+        return new Tweet[0];
     }
 
     private static OAuthService createOAuthService() {

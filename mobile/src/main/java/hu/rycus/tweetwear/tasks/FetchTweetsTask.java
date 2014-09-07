@@ -11,7 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
@@ -19,14 +21,15 @@ import hu.rycus.tweetwear.common.api.ApiClientRunnable;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
+import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
-public class FetchTimelineTask extends ApiClientRunnable {
+public class FetchTweetsTask extends ApiClientRunnable {
 
-    private static final String TAG = FetchTimelineTask.class.getSimpleName();
+    private static final String TAG = FetchTweetsTask.class.getSimpleName();
 
     private static final int DEFAULT_TWEET_LIMIT = 10;
 
@@ -40,7 +43,7 @@ public class FetchTimelineTask extends ApiClientRunnable {
 
     private int tweetCountLimit = DEFAULT_TWEET_LIMIT;
 
-    public FetchTimelineTask(final IAccountProvider accountProvider, final ITwitterClient client) {
+    public FetchTweetsTask(final IAccountProvider accountProvider, final ITwitterClient client) {
         this.accountProvider = accountProvider;
         this.client = client;
     }
@@ -76,23 +79,46 @@ public class FetchTimelineTask extends ApiClientRunnable {
         final TreeSet<Tweet> tweets = new TreeSet<Tweet>();
         for (final Account account : accountProvider.getAccounts(context)) {
             final Token token = account.getAccessToken();
+            final ListSettings listSettings = account.getListSettings();
+
             final long userId = TwitterFactory.getUserId(context, client, token);
 
-            final Tweet[] timelineTweets = client.getTimeline(
-                    token, tweetCountLimit, sinceId, null, null, null, null, null);
-
-            markOwnTweets(userId, timelineTweets);
+            final Collection<Tweet> accountTweets = loadNewTweetsForAccount(token, listSettings);
+            markOwnTweets(userId, accountTweets);
 
             Log.d(TAG, String.format("Tweets retrieved for account (%s): %d",
-                    account.getUsername(), timelineTweets.length));
+                    account.getUsername(), accountTweets.size()));
 
-            tweets.addAll(Arrays.asList(timelineTweets));
+            tweets.addAll(accountTweets);
         }
 
         setNewTweets(tweets);
     }
 
-    protected void markOwnTweets(final long userId, final Tweet[] tweets) {
+    protected Collection<Tweet> loadNewTweetsForAccount(final Token token,
+                                                        final ListSettings listSettings) {
+        final Set<Tweet> tweets = new HashSet<Tweet>();
+
+        if (listSettings.isTimelineSelected()) {
+            final Tweet[] timelineTweets = client.getTimeline(
+                    token, tweetCountLimit, sinceId, null, null, null, null, null);
+            tweets.addAll(Arrays.asList(timelineTweets));
+
+            Log.d(TAG, String.format("Loaded tweets for timeline: %d", timelineTweets.length));
+        }
+
+        for (final long listId : listSettings.getSelectedListIds()) {
+            final Tweet[] listTweets = client.getListStatuses(
+                    token, listId, tweetCountLimit, sinceId, null, null, null);
+            tweets.addAll(Arrays.asList(listTweets));
+
+            Log.d(TAG, String.format("Loaded tweets for list #%d: %d", listId, listTweets.length));
+        }
+
+        return tweets;
+    }
+
+    protected void markOwnTweets(final long userId, final Collection<Tweet> tweets) {
         for (final Tweet tweet : tweets) {
             tweet.setOwnTweet(tweet.getUser().getId() == userId);
         }

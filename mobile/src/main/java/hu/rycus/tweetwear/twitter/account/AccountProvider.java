@@ -7,6 +7,7 @@ import org.scribe.model.Token;
 import java.util.Collection;
 import java.util.Collections;
 
+import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
 
 public class AccountProvider implements IAccountProvider {
@@ -16,7 +17,8 @@ public class AccountProvider implements IAccountProvider {
         final Token accessToken = Preferences.getUserToken(context);
         if (accessToken != null) {
             final String username = getUsername(context);
-            return Collections.singleton(new Account(username, accessToken));
+            final ListSettings listSettings = Preferences.getListSettings(context);
+            return Collections.singleton(new Account(username, accessToken, listSettings));
         } else {
             return Collections.emptyList();
         }

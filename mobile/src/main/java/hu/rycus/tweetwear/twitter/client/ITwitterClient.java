@@ -4,6 +4,7 @@ import android.content.Context;
 
 import org.scribe.model.Token;
 
+import hu.rycus.tweetwear.common.model.Lists;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
@@ -38,6 +39,12 @@ public interface ITwitterClient {
 
     Tweet postStatus(Token accessToken, String content, Long inReplyToStatusId);
 
+    Lists getLists(Context context, ListType listType, Long cursor, Integer count);
+
+    Tweet[] getListStatuses(Token accessToken,
+                            long listId, Integer count, Long sinceId, Long maxId,
+                            Boolean includeEntities, Boolean includeRTs);
+
     enum Uri {
 
         CALLBACK("tweetwear://oauth_callback"),
@@ -45,7 +52,10 @@ public interface ITwitterClient {
         RETWEET("https://api.twitter.com/1.1/statuses/retweet/%d.json"),
         FAVORITE("https://api.twitter.com/1.1/favorites/create.json"),
         UPDATE_STATUS("https://api.twitter.com/1.1/statuses/update.json"),
-        VERIFY_CREDENTIALS("https://api.twitter.com/1.1/account/verify_credentials.json");
+        VERIFY_CREDENTIALS("https://api.twitter.com/1.1/account/verify_credentials.json"),
+        LIST_STATUSES("https://api.twitter.com/1.1/lists/statuses.json"),
+        LIST_SUBSCRIPTIONS("https://api.twitter.com/1.1/lists/subscriptions.json"),
+        LIST_OWNERSHIPS("https://api.twitter.com/1.1/lists/ownerships.json");
 
         private final String uri;
 
@@ -79,7 +89,12 @@ public interface ITwitterClient {
         LATITUDE("lat"),
         LONGITUDE("long"),
         PLACE_ID("place_id"),
-        DISPLAY_COORDINATES("display_coordinates");
+        DISPLAY_COORDINATES("display_coordinates"),
+        USER_ID("user_id"),
+        SCREEN_NAME("screen_name"),
+        CURSOR("cursor"),
+        LIST_ID("list_id"),
+        INCLUDE_RTS("include_rts");
 
         private final String key;
 
@@ -120,6 +135,12 @@ public interface ITwitterClient {
         public boolean matches(final String value) {
             return this.value.equalsIgnoreCase(value);
         }
+
+    }
+
+    enum ListType {
+
+        SUBSCRIPTIONS, OWNERSHIPS
 
     }
 

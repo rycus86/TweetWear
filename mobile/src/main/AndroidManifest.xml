@@ -17,10 +17,9 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -34,6 +33,11 @@
                     android:scheme="tweetwear" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.ListSettingActivity"
+            android:label="@string/lists_header"
+            android:parentActivityName=".SettingsActivity"/>
 
         <service
             android:name=".SyncService"

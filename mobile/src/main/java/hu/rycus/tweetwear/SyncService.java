@@ -8,12 +8,22 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.Collections;
+
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
+import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.TweetData;
+import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.tasks.ClearExistingTweetsTask;
-import hu.rycus.tweetwear.tasks.FetchTimelineTask;
+import hu.rycus.tweetwear.tasks.FetchTweetsTask;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
+import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
@@ -79,7 +89,7 @@ public class SyncService extends Service {
     private void requestFetchTimeline() {
         final IAccountProvider provider = TwitterFactory.createProvider();
         final ITwitterClient twitterClient = TwitterFactory.createClient();
-        ApiClientHelper.runAsynchronously(this, new FetchTimelineTask(provider, twitterClient));
+        ApiClientHelper.runAsynchronously(this, new FetchTweetsTask(provider, twitterClient));
     }
 
     private void requestClearExistingTweets() {
@@ -101,6 +111,12 @@ public class SyncService extends Service {
         context.startService(intent);
     }
 
+    public static void createDemoTweet(final Context context) {
+        final IAccountProvider provider = new DemoAccountProvider();
+        final ITwitterClient twitterClient = DemoTwitterClient.create();
+        ApiClientHelper.runAsynchronously(context, new FetchTweetsTask(provider, twitterClient));
+    }
+
     public static void clearExisting(final Context context) {
         final Intent intent = createIntent(context, Constants.ACTION_CLEAR_EXISTING);
         context.startService(intent);
@@ -110,6 +126,33 @@ public class SyncService extends Service {
         final Intent intent = new Intent(context, SyncService.class);
         intent.setAction(action);
         return intent;
+    }
+
+    private static class DemoAccountProvider implements IAccountProvider {
+        @Override
+        public Collection<Account> getAccounts(final Context context) {
+            return Collections.singleton(new Account("test@demo.com", null, new ListSettings()));
+        }
+    }
+
+    private static class DemoTwitterClient implements InvocationHandler {
+
+        @Override
+        public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            if (method.getName().equals("getTimeline")) {
+                return new Tweet[] { TweetData.demo(System.currentTimeMillis()) };
+            }
+
+            return null;
+        }
+
+        public static ITwitterClient create() {
+            return (ITwitterClient) Proxy.newProxyInstance(
+                    DemoTwitterClient.class.getClassLoader(),
+                    new Class[]{ITwitterClient.class},
+                    new DemoTwitterClient());
+        }
+
     }
 
 }

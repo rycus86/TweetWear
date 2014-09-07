@@ -25,6 +25,16 @@ public class Mapper {
         return null;
     }
 
+    public static <T> T readObject(final String data, final Class<T> targetClass) {
+        try {
+            return OBJECT_MAPPER.readValue(data, targetClass);
+        } catch (IOException ex) {
+            Log.e(TAG, String.format("Failed to read object from string data"), ex);
+        }
+
+        return null;
+    }
+
     public static <T> T readObject(final InputStream inputStream, final Class<T> targetClass) {
         try {
             return OBJECT_MAPPER.readValue(inputStream, targetClass);
@@ -38,6 +48,16 @@ public class Mapper {
     public static byte[] writeObject(final Object object) {
         try {
             return OBJECT_MAPPER.writeValueAsBytes(object);
+        } catch (IOException ex) {
+            Log.e(TAG, String.format("Failed to write object to byte data"), ex);
+        }
+
+        return null;
+    }
+
+    public static String writeObjectAsString(final Object object) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(object);
         } catch (IOException ex) {
             Log.e(TAG, String.format("Failed to write object to byte data"), ex);
         }
