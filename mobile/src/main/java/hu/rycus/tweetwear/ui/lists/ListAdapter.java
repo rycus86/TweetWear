@@ -2,6 +2,7 @@ package hu.rycus.tweetwear.ui.lists;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.model.List;
 import hu.rycus.tweetwear.common.model.Lists;
+import hu.rycus.tweetwear.common.util.Mapper;
 import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
@@ -26,6 +28,13 @@ import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 public class ListAdapter extends BaseAdapter {
 
     private static final String TAG = ListAdapter.class.getSimpleName();
+
+    private static final String KEY_PREFIX = ListAdapter.class.getCanonicalName();
+    private static final String KEY_CONTENTS = KEY_PREFIX + ".contents";
+    private static final String KEY_LIST_SIZE = KEY_PREFIX + ".listSize";
+    private static final String KEY_FINISHED = KEY_PREFIX + ".finished";
+    private static final String KEY_LOADING = KEY_PREFIX + ".loading";
+    private static final String KEY_LAST_CURSOR = KEY_PREFIX + ".lastCursor";
 
     private final ITwitterClient.ListType listType;
     private final ArrayList<List> contents = new ArrayList<List>();
@@ -37,7 +46,7 @@ public class ListAdapter extends BaseAdapter {
     private boolean loading = false;
     private Long lastCursor = null;
 
-    public ListAdapter(final ITwitterClient.ListType listType) {
+    private ListAdapter(final ITwitterClient.ListType listType) {
         this.listType = listType;
     }
 
@@ -199,6 +208,32 @@ public class ListAdapter extends BaseAdapter {
         TextView txtDescription;
         CheckBox ckboxSelected;
 
+    }
+
+    public void onSaveState(final Bundle bundle) {
+        bundle.putString(KEY_CONTENTS, Mapper.writeObjectAsString(contents));
+        bundle.putInt(KEY_LIST_SIZE, listSize);
+        bundle.putBoolean(KEY_FINISHED, finished);
+        bundle.putBoolean(KEY_LOADING, loading);
+        if (lastCursor != null) {
+            bundle.putLong(KEY_LAST_CURSOR, lastCursor);
+        }
+    }
+
+    public static ListAdapter create(final ITwitterClient.ListType listType,
+                                     final Bundle savedState) {
+        final ListAdapter adapter = new ListAdapter(listType);
+        if (savedState != null) {
+            adapter.listSize = savedState.getInt(KEY_LIST_SIZE, 0);
+            adapter.finished = savedState.getBoolean(KEY_FINISHED, false);
+            adapter.loading = savedState.getBoolean(KEY_LOADING, false);
+            adapter.lastCursor = (Long) savedState.get(KEY_LAST_CURSOR);
+
+            final String savedContents = savedState.getString(KEY_CONTENTS, "[]");
+            final List[] savedLists = Mapper.readObject(savedContents, List[].class);
+            adapter.contents.addAll(Arrays.asList(savedLists));
+        }
+        return adapter;
     }
 
 }

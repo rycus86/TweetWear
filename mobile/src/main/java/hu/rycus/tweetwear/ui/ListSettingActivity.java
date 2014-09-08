@@ -20,6 +20,9 @@ public class ListSettingActivity extends Activity {
 
     private static final String TAG = ListSettingActivity.class.getSimpleName();
 
+    private static final String KEY_SELECTED_TAB =
+            ListSettingActivity.class.getCanonicalName() + ".selectedTab";
+
     private View vTimelineContainer;
     private CheckBox ckboxTimeline;
 
@@ -56,10 +59,27 @@ public class ListSettingActivity extends Activity {
             }
         });
 
-        setupActionBarTabs();
+        final Integer selectedTab;
+        if (savedInstanceState != null) {
+            selectedTab = (Integer) savedInstanceState.get(KEY_SELECTED_TAB);
+        } else {
+            selectedTab = null;
+        }
+
+        setupActionBarTabs(selectedTab);
     }
 
-    private void setupActionBarTabs() {
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        final ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            outState.putInt(KEY_SELECTED_TAB, actionBar.getSelectedTab().getPosition());
+        }
+    }
+
+    private void setupActionBarTabs(final Integer selectedTab) {
         final ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -70,6 +90,10 @@ public class ListSettingActivity extends Activity {
             actionBar.addTab(actionBar.newTab()
                     .setText(getString(R.string.lists_owned).toUpperCase())
                     .setTabListener(tabListenerOwnership));
+
+            if (selectedTab != null) {
+                actionBar.getTabAt(selectedTab).select();
+            }
         }
     }
 

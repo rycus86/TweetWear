@@ -24,7 +24,7 @@ public class ListFragment extends android.app.ListFragment {
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setListAdapter(new ListAdapter(getListType()));
+        setListAdapter(ListAdapter.create(getListType(), savedInstanceState));
     }
 
     @Override
@@ -57,10 +57,29 @@ public class ListFragment extends android.app.ListFragment {
         });
     }
 
-    void resetAdapterData() {
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        final ListAdapter adapter = getConvertedAdapter();
+        if (adapter != null) {
+            adapter.onSaveState(outState);
+        }
+    }
+
+    private ListAdapter getConvertedAdapter() {
         final android.widget.ListAdapter adapter = getListAdapter();
         if (adapter != null && adapter instanceof ListAdapter) {
-            ((ListAdapter) adapter).resetListData();
+            return (ListAdapter) adapter;
+        } else {
+            return null;
+        }
+    }
+
+    void resetAdapterData() {
+        final ListAdapter adapter = getConvertedAdapter();
+        if (adapter != null) {
+            adapter.resetListData();
         }
     }
 
