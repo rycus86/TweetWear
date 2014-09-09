@@ -12,6 +12,7 @@ public interface Constants {
     String ACTION_SEND_RETWEET = PACKAGE_NAME + ".SendRetweet";
     String ACTION_SEND_FAVORITE = PACKAGE_NAME + ".SendFavorite";
     String ACTION_CAPTURE_REPLY = PACKAGE_NAME + ".CaptureReply";
+    String ACTION_MARK_AS_READ = PACKAGE_NAME + ".MarkAsRead";
 
     String EXTRA_TWEET_ID = "__tweet_id";
     String EXTRA_REPLY_TO_NAME = "__reply_to_name";
@@ -28,6 +29,7 @@ public interface Constants {
         FAVORITE("/favorite/%"),
         POST_NEW_TWEET("/post/new/tweet"),
         POST_REPLY("/post/reply/%"),
+        MARK_AS_READ("/mark/as/read"),
         RESULT_RETWEET_SUCCESS("/retweet/%/success"),
         RESULT_RETWEET_FAILURE("/retweet/%/failure"),
         RESULT_FAVORITE_SUCCESS("/favorite/%/success"),

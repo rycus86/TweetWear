@@ -3,12 +3,15 @@ package hu.rycus.tweetwear.preferences;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.scribe.model.Token;
 
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
 public class Preferences {
+
+    private static final String TAG = Preferences.class.getSimpleName();
 
     public static final String PREFERENCES_NAME = "tweetwear";
 
@@ -25,7 +28,12 @@ public class Preferences {
 
     private static final String KEY_REFRESH_INTERVAL = "interval";
 
+    private static final String KEY_VIBRATE = "vibrate";
+    private static final String KEY_MARK_AS_READ = "mark_as_read_on_delete";
+
     private static final String KEY_LIST_SETTINGS = "listSettings.0";
+
+    private static final String KEY_LAST_READ_TWEET_ID = "lastReadTweetId";
 
     public static boolean saveRequestToken(final Context context, final Token token) {
         return saveToken(context, token, KEY_API_TOKEN, KEY_API_SECRET);
@@ -77,6 +85,13 @@ public class Preferences {
         final SharedPreferences preferences = getPreferences(context);
         return preferences.edit()
                 .putString(KEY_LIST_SETTINGS, settings.serialize())
+                .commit();
+    }
+
+    public static boolean saveLastReadTweetId(final Context context, final long id) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.edit()
+                .putLong(KEY_LAST_READ_TWEET_ID, id)
                 .commit();
     }
 
@@ -136,6 +151,54 @@ public class Preferences {
             return ListSettings.create(stringValue);
         } else {
             return new ListSettings();
+        }
+    }
+
+    public static long getLastReadTweetId(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.getLong(KEY_LAST_READ_TWEET_ID, -1L);
+    }
+
+    public static boolean isVibrationEnabled(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.getBoolean(KEY_VIBRATE, true);
+    }
+
+    public static boolean isMarkAsReadOnDeleteEnabled(final Context context) {
+        final SharedPreferences preferences = getPreferences(context);
+        return preferences.getBoolean(KEY_MARK_AS_READ, false);
+    }
+
+    /**
+     * Bugfix: if the interval was saved as a Long
+     * then reading it as a String will result in a ClassCastException.
+     */
+    public static void fixRefreshIntervalIfNeeded(final Context context) {
+        try {
+            final long interval = Preferences.getRefreshInterval(context);
+            if (interval < AlarmManager.INTERVAL_FIFTEEN_MINUTES) {
+                final String message = String.format("Illegal refresh interval: %s", interval);
+                throw new IllegalArgumentException(message);
+            }
+        } catch (Exception ex) {
+            try {
+                final SharedPreferences preferences = getPreferences(context);
+                final long interval = preferences.getLong(
+                        KEY_REFRESH_INTERVAL, AlarmManager.INTERVAL_HALF_HOUR);
+                if (setRefreshInterval(context, interval)) {
+                    Log.d(TAG, String.format(
+                            "Refresh interval converted to String from %d", interval));
+                } else {
+                    Log.e(TAG, "Failed to convert refresh interval to String");
+                }
+            } catch (Exception innerEx) {
+                // something went very wrong, reset the preference
+                if (setRefreshInterval(context, AlarmManager.INTERVAL_HALF_HOUR)) {
+                    Log.w(TAG, "Refresh interval has been set back to default");
+                } else {
+                    Log.e(TAG, "Refresh interval needed to be set back to default but failed");
+                }
+            }
         }
     }
 

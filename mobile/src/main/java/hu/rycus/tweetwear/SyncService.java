@@ -93,7 +93,7 @@ public class SyncService extends Service {
     }
 
     private void requestClearExistingTweets() {
-        ApiClientHelper.runAsynchronously(this, new ClearExistingTweetsTask());
+        ApiClientHelper.runAsynchronously(this, new ClearExistingTweetsTask(false));
     }
 
     public static void scheduleSync(final Context context) {

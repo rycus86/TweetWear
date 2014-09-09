@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/pref_header_account" android:order="10">
+    <PreferenceCategory
+        android:title="@string/pref_header_account"
+        android:order="10">
 
         <Preference
             android:key="ac_account_info"
@@ -16,10 +18,30 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="cat_notification"
+        android:persistent="false"
+        android:title="@string/pref_header_notification"
+        android:order="20">
+
+        <CheckBoxPreference
+            android:key="vibrate"
+            android:title="@string/vibrate"
+            android:defaultValue="true"/>
+
+        <CheckBoxPreference
+            android:key="mark_as_read_on_delete"
+            android:title="@string/pref_mark_as_read"
+            android:summaryOn="@string/pref_mark_as_read_on"
+            android:summaryOff="@string/pref_mark_as_read_off"
+            android:defaultValue="false"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="cat_sync"
         android:persistent="false"
         android:title="@string/pref_header_synchronization"
-        android:order="20">
+        android:order="30">
 
         <ListPreference
             android:key="interval"
@@ -46,7 +68,9 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/pref_header_about" android:order="30">
+    <PreferenceCategory
+        android:title="@string/pref_header_about"
+        android:order="40">
 
         <Preference
             android:key="ac_version_header"

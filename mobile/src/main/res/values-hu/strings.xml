@@ -56,9 +56,15 @@
     <string name="error_load_lists">Nem sikerült betölteni a listákat</string>
 
     <string name="pref_header_account">Fiók</string>
+    <string name="pref_header_notification">Értesítések</string>
     <string name="pref_header_synchronization">Frissítések</string>
     <string name="pref_header_about">Névjegy</string>
 
     <string name="pref_dialog_interval">Válassz frissítési gyakoriságot</string>
+
+    <string name="vibrate">Rezgés</string>
+    <string name="pref_mark_as_read">Törléskor megjelölés olvasottként</string>
+    <string name="pref_mark_as_read_on">Csak újak látszanak</string>
+    <string name="pref_mark_as_read_off">Mindig az utolsó 10 látszik</string>
 
 </resources>

@@ -12,6 +12,7 @@ import java.util.List;
 
 import hu.rycus.tweetwear.common.api.ApiClientRunnable;
 import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.payload.NotificationSettings;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.SummaryNotification;
 import hu.rycus.tweetwear.notification.TweetNotification;
@@ -21,6 +22,12 @@ public class TweetNotificationTask extends ApiClientRunnable {
     private static final String TAG = TweetNotificationTask.class.getSimpleName();
 
     private static final int LIMIT = 10;
+
+    private final NotificationSettings settings;
+
+    public TweetNotificationTask(final NotificationSettings settings) {
+        this.settings = settings;
+    }
 
     @Override
     protected void run(final Context context, final GoogleApiClient apiClient) throws Exception {
@@ -33,7 +40,7 @@ public class TweetNotificationTask extends ApiClientRunnable {
             TweetNotification.send(context, tweet);
         }
 
-        SummaryNotification.send(context, tweets.size());
+        SummaryNotification.send(context, tweets.size(), settings);
     }
 
     private Collection<Tweet> getLastTweets(final Collection<Tweet> unordered, final int limit) {

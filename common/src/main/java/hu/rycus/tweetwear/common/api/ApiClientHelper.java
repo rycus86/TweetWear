@@ -13,6 +13,8 @@ import com.google.android.gms.wearable.Wearable;
 
 import java.util.List;
 
+import hu.rycus.tweetwear.common.util.Mapper;
+
 public class ApiClientHelper {
 
     private static final String TAG = ApiClientHelper.class.getSimpleName();
@@ -74,6 +76,12 @@ public class ApiClientHelper {
         }
 
         return null;
+    }
+
+    public static boolean sendMessageToConnectedNode(final GoogleApiClient apiClient,
+                                                     final String path, final Object payload) {
+        final byte[] byteData = Mapper.writeObject(payload);
+        return sendMessageToConnectedNode(apiClient, path, byteData);
     }
 
     public static boolean sendMessageToConnectedNode(final GoogleApiClient apiClient,

@@ -56,9 +56,15 @@
     <string name="error_load_lists">Fallo al cargar las listas</string>
 
     <string name="pref_header_account">Cuenta</string>
+    <string name="pref_header_notification">Notificación</string>
     <string name="pref_header_synchronization">Sincronizacion</string>
     <string name="pref_header_about">Sobre</string>
 
     <string name="pref_dialog_interval">Seleccionar intervalo de refresco</string>
+
+    <string name="vibrate">Vibrar</string>
+    <string name="pref_mark_as_read">Marcado como leído al borrar</string>
+    <string name="pref_mark_as_read_on">Mostrar solo nuevos Tweets</string>
+    <string name="pref_mark_as_read_off">Siempre mostrar los últimos 10 Tweets</string>
 
 </resources>

@@ -19,9 +19,11 @@ import java.util.TreeSet;
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.api.ApiClientRunnable;
 import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.payload.NotificationSettings;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.preferences.ListSettings;
+import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
@@ -68,14 +70,23 @@ public class FetchTweetsTask extends ApiClientRunnable {
                 }
             }
 
-            ApiClientHelper.sendMessageToConnectedNode(
-                    apiClient, Constants.DataPath.SYNC_COMPLETE.get(), null);
+            sendSyncCompleteEvent(context, apiClient);
         } else {
             Log.d(TAG, "There are no tweets to send at this time");
         }
     }
 
+    protected void sendSyncCompleteEvent(final Context context, final GoogleApiClient apiClient) {
+        final NotificationSettings settings = getNotificationSettings(context);
+        ApiClientHelper.sendMessageToConnectedNode(
+                apiClient, Constants.DataPath.SYNC_COMPLETE.get(), settings);
+    }
+
     protected void loadNewTweets(final Context context) {
+        if (Preferences.isMarkAsReadOnDeleteEnabled(context)) {
+            checkMarkedTweetId(context);
+        }
+
         final TreeSet<Tweet> tweets = new TreeSet<Tweet>();
         for (final Account account : accountProvider.getAccounts(context)) {
             final Token token = account.getAccessToken();
@@ -156,6 +167,11 @@ public class FetchTweetsTask extends ApiClientRunnable {
         return existingTweets;
     }
 
+    protected void checkMarkedTweetId(final Context context) {
+        final long lastReadTweetId = Preferences.getLastReadTweetId(context);
+        checkSinceId(lastReadTweetId);
+    }
+
     protected void setExistingTweets(final Collection<Tweet> tweets) {
         this.existingTweets = tweets;
         checkSinceIdInTweets(tweets);
@@ -163,14 +179,20 @@ public class FetchTweetsTask extends ApiClientRunnable {
 
     protected void checkSinceIdInTweets(final Collection<Tweet> tweets) {
         for (final Tweet tweet : tweets) {
-            checkSinceId(tweet);
+            checkSinceId(tweet.getId());
         }
     }
 
-    protected void checkSinceId(final Tweet tweet) {
-        if (sinceId == null || sinceId < tweet.getId()) {
-            sinceId = tweet.getId();
+    protected void checkSinceId(final long id) {
+        if (sinceId == null || sinceId < id) {
+            sinceId = id;
         }
+    }
+
+    protected NotificationSettings getNotificationSettings(final Context context) {
+        final NotificationSettings settings = new NotificationSettings();
+        settings.setVibrate(Preferences.isVibrationEnabled(context));
+        return settings;
     }
 
 }

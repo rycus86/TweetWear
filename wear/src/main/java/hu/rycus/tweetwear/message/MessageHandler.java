@@ -10,6 +10,7 @@ import hu.rycus.tweetwear.PostTweetActivity;
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.model.Tweet;
+import hu.rycus.tweetwear.common.payload.NotificationSettings;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.TweetNotification;
@@ -24,7 +25,9 @@ public class MessageHandler {
     public static void handle(final Context context, final MessageEvent messageEvent) {
         final String path = messageEvent.getPath();
         if (Constants.DataPath.SYNC_COMPLETE.matches(path)) {
-            onSyncComplete(context);
+            final NotificationSettings settings =
+                    NotificationSettings.parse(messageEvent.getData());
+            onSyncComplete(context, settings);
         } else if (Constants.DataPath.RESULT_RETWEET_SUCCESS.matches(path)) {
             final Tweet tweet = TweetData.parse(messageEvent.getData());
             onSuccessfulRetweet(context, tweet);
@@ -54,9 +57,9 @@ public class MessageHandler {
         }
     }
 
-    private static void onSyncComplete(final Context context) {
+    private static void onSyncComplete(final Context context, final NotificationSettings settings) {
         Log.d(TAG, "Starting Tweet notification task");
-        ApiClientHelper.runAsynchronously(context, new TweetNotificationTask());
+        ApiClientHelper.runAsynchronously(context, new TweetNotificationTask(settings));
     }
 
     private static void onSuccessfulRetweet(final Context context, final Tweet tweet) {

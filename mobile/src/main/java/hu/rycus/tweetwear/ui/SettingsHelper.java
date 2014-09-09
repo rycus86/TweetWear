@@ -138,6 +138,9 @@ public class SettingsHelper {
     @SuppressWarnings("deprecation")
     public static void setupSharedPreferences(final PreferenceActivity activity) {
         activity.getPreferenceManager().setSharedPreferencesName(Preferences.PREFERENCES_NAME);
+
+        // fix a bug when refresh interval was modified and saved as a Long
+        Preferences.fixRefreshIntervalIfNeeded(activity);
     }
 
     @SuppressWarnings("deprecation")

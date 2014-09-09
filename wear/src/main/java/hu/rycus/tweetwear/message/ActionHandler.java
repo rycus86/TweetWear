@@ -7,6 +7,7 @@ import android.util.Log;
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.task.FavoriteTask;
+import hu.rycus.tweetwear.task.MarkAsReadTask;
 import hu.rycus.tweetwear.task.RetweetTask;
 
 public class ActionHandler {
@@ -20,6 +21,8 @@ public class ActionHandler {
             sendRetweet(context, intent);
         } else if (Constants.ACTION_SEND_FAVORITE.equals(intent.getAction())) {
             sendFavorite(context, intent);
+        } else if (Constants.ACTION_MARK_AS_READ.equals(intent.getAction())) {
+            sendMarkAsRead(context);
         }
     }
 
@@ -37,6 +40,11 @@ public class ActionHandler {
             Log.d(TAG, String.format("Sending favorite for id #%d", tweetId));
             ApiClientHelper.runAsynchronously(context, new FavoriteTask(tweetId));
         }
+    }
+
+    private static void sendMarkAsRead(final Context context) {
+        Log.d(TAG, "Sending mark-as-read request");
+        ApiClientHelper.runAsynchronously(context, new MarkAsReadTask());
     }
 
 }

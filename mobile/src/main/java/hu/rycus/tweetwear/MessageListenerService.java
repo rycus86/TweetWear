@@ -7,6 +7,8 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.tasks.ClearExistingTweetsTask;
 import hu.rycus.tweetwear.tasks.FavoriteTask;
 import hu.rycus.tweetwear.tasks.PostTweetTask;
 import hu.rycus.tweetwear.tasks.RetweetTask;
@@ -44,6 +46,14 @@ public class MessageListenerService extends WearableListenerService {
             Log.d(TAG, String.format("Received request to post a reply saying: %s", text));
 
             ApiClientHelper.runAsynchronously(this, PostTweetTask.reply(text, tweetId));
+        } else if (Constants.DataPath.MARK_AS_READ.matches(path)) {
+            Log.d(TAG, "Received mark-as-read request");
+
+            if (Preferences.isMarkAsReadOnDeleteEnabled(this)) {
+                ApiClientHelper.runAsynchronously(this, new ClearExistingTweetsTask(true));
+            } else {
+                Log.d(TAG, "Mark-as-read is disabled, not doing anything");
+            }
         }
     }
 
