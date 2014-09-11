@@ -33,4 +33,38 @@
     <string name="about_notice">Нажмите для отправки предложения или сообщения об ошибке</string>
     <string name="about_link">https://github.com/rycus86/TweetWear/issues</string>
 
+    <string name="error_access_token_save">Ошибка сохранения токена</string>
+
+    <string name="loading">Загрузка&#8230;</string>
+
+    <string name="nothing_selected">Ничего не выбрано</string>
+
+    <string name="timeline">Лента</string>
+
+    <string name="lists_header">Выберите списки</string>
+    <string name="lists_empty">Списков не найдено</string>
+
+    <string name="lists_subscribed">Подписан на</string>
+    <string name="lists_owned">Собственные списки</string>
+
+    <string name="pref_lists">Списки</string>
+    <plurals name="pref_list_summary_lists">
+        <item quantity="one">1 список</item>
+        <item quantity="other">%1$d списков</item>
+    </plurals>
+
+    <string name="error_load_lists">Ошибка загрузки списков</string>
+
+    <string name="pref_header_account">Аккаунт</string>
+    <string name="pref_header_notification">Оповещение</string>
+    <string name="pref_header_synchronization">Синхронизация</string>
+    <string name="pref_header_about">О программе</string>
+
+    <string name="pref_dialog_interval">Интервал обновления</string>
+
+    <string name="vibrate">Вибрация</string>
+    <string name="pref_mark_as_read">Отметить как прочитанное при удалении</string>
+    <string name="pref_mark_as_read_on">Показывать только новые твиты</string>
+    <string name="pref_mark_as_read_off">Всегда показывать последние 10 твитов</string>
+
 </resources>
