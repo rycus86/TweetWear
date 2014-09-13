@@ -15,6 +15,7 @@ import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,11 @@ import java.util.List;
 
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.User;
+import hu.rycus.tweetwear.common.model.entities.Entities;
+import hu.rycus.tweetwear.common.model.entities.Hashtag;
+import hu.rycus.tweetwear.common.model.entities.Media;
+import hu.rycus.tweetwear.common.model.entities.Url;
+import hu.rycus.tweetwear.common.model.entities.UserMention;
 
 public final class TweetData {
 
@@ -40,6 +46,10 @@ public final class TweetData {
 
     public static Tweet parse(final byte[] data) {
         return Mapper.readObject(data, Tweet.class);
+    }
+
+    public static Tweet parse(final String json) {
+        return Mapper.readObject(json, Tweet.class);
     }
 
     public static Collection<Tweet> loadAll(final GoogleApiClient apiClient) {
@@ -73,6 +83,74 @@ public final class TweetData {
         } else {
             return null;
         }
+    }
+
+    public String toJson() {
+        if (tweet != null) {
+            return Mapper.writeObjectAsString(tweet);
+        } else {
+            return null;
+        }
+    }
+
+    public String getTitle() {
+        if (tweet.getRetweetedStatus() != null) {
+            return "@" + tweet.getRetweetedStatus().getUser().getScreenName();
+        } else {
+            return "@" + tweet.getUser().getScreenName();
+        }
+    }
+
+    public String getTimestamp() {
+        final DateFormat dateFormat =
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+        return dateFormat.format(tweet.getCreatedAt());
+    }
+
+    public String toFormattedHtml() {
+        String content = tweet.getText();
+        if (tweet.getEntities() != null) {
+            content = processEntities(content);
+        }
+        return content;
+    }
+
+    private String processEntities(final String originalContent) {
+        final Entities entities = tweet.getEntities();
+
+        String content = originalContent;
+
+        if (entities.getHashtags() != null) {
+            for (final Hashtag hashtag : entities.getHashtags()) {
+                content = content.replace("#" + hashtag.getText(),
+                        String.format("<i>#<b>%s</b></i>", hashtag.getText()));
+            }
+        }
+
+        if (entities.getUrls() != null) {
+            for (final Url url : entities.getUrls()) {
+                content = content.replace(url.getUrl(),
+                        String.format("<font color='#0099FF'><i>%s</i></font>",
+                                url.getDisplayUrl()));
+            }
+        }
+
+        if (entities.getMedia() != null) {
+            for (final Media media : entities.getMedia()) {
+                content = content.replace(media.getUrl(), "");
+            }
+        }
+
+        if (entities.getUserMentions() != null) {
+            for (final UserMention mention : entities.getUserMentions()) {
+                content = content.replace(
+                        String.format("@%s", mention.getScreenName()),
+                        String.format("<font color='#0033CC'><i>@%s</i></font>",
+                                mention.getName()));
+            }
+        }
+
+        return content;
     }
 
     public boolean sendBlocking(final GoogleApiClient apiClient) {

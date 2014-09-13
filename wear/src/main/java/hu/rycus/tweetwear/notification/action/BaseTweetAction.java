@@ -35,8 +35,8 @@ abstract class BaseTweetAction {
         return 0;
     }
 
-    protected CharSequence getTitleWithActionAndTweetInformation(final Context context, final Tweet tweet,
-                                                                 final String action) {
+    protected CharSequence getTitleWithActionAndTweetInformation(
+            final Context context, final Tweet tweet, final String action) {
         String tweetInformation = String.format(
                 "@%s: %s", tweet.getUser().getScreenName(), tweet.getText());
         if (tweetInformation.length() > 25) {

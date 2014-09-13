@@ -31,4 +31,9 @@
         <item quantity="other">%d új tweet</item>
     </plurals>
 
+    <string name="read_later">Olvasás később</string>
+    <string name="read_later_saved">Elmentve</string>
+    <string name="read_later_successful">Elmentve későbbre</string>
+    <string name="read_later_failure">Nem sikerült elmenteni</string>
+
 </resources>

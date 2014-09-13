@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_read_later"
+        android:title="@string/read_later"
+        android:actionLayout="@layout/menu_read_later_action"
+        android:showAsAction="always"/>
+
+    <item
+        android:id="@+id/debug_delete_database"
+        android:title="@string/debug_delete_database"/>
+
+</menu>

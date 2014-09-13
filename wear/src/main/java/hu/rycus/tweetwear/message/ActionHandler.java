@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.util.Log;
 
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
+import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.task.FavoriteTask;
 import hu.rycus.tweetwear.task.MarkAsReadTask;
+import hu.rycus.tweetwear.task.ReadItLaterTask;
 import hu.rycus.tweetwear.task.RetweetTask;
 
 public class ActionHandler {
@@ -23,6 +26,8 @@ public class ActionHandler {
             sendFavorite(context, intent);
         } else if (Constants.ACTION_MARK_AS_READ.equals(intent.getAction())) {
             sendMarkAsRead(context);
+        } else if (Constants.ACTION_READ_IT_LATER.equals(intent.getAction())) {
+            sendReadItLater(context, intent);
         }
     }
 
@@ -45,6 +50,16 @@ public class ActionHandler {
     private static void sendMarkAsRead(final Context context) {
         Log.d(TAG, "Sending mark-as-read request");
         ApiClientHelper.runAsynchronously(context, new MarkAsReadTask());
+    }
+
+    private static void sendReadItLater(final Context context, final Intent intent) {
+        final String tweetJson = intent.getStringExtra(Constants.EXTRA_TWEET_JSON);
+        final Tweet tweet = TweetData.parse(tweetJson);
+        final String url = intent.getStringExtra(Constants.EXTRA_READ_IT_LATER_URL);
+        if (tweet != null && url != null) {
+            Log.d(TAG, String.format("Requesting read later for url: %s", url));
+            ApiClientHelper.runAsynchronously(context, new ReadItLaterTask(tweet, url));
+        }
     }
 
 }

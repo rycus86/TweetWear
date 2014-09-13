@@ -20,4 +20,7 @@ public class User {
     @JsonProperty("screen_name")
     private String screenName;
 
+    @JsonProperty("profile_image_url")
+    private String profileImageUrl;
+
 }

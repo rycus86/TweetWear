@@ -31,4 +31,9 @@
         <item quantity="other">%d новых твитов</item>
     </plurals>
 
+    <string name="read_later">Прочитать позже</string>
+    <string name="read_later_saved">Сохраненное</string>
+    <string name="read_later_successful">Сохранено для дальнейшего прочтения</string>
+    <string name="read_later_failure">Ошибка сохранения</string>
+
 </resources>

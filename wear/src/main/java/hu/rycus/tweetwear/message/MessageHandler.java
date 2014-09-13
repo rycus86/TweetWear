@@ -54,6 +54,13 @@ public class MessageHandler {
         } else if (Constants.DataPath.RESULT_POST_REPLY_FAILURE.matches(path)) {
             final String message = context.getString(R.string.post_tweet_failure_reply);
             onFailedPost(context, message);
+        } else if (Constants.DataPath.RESULT_READ_IT_LATER_SUCCESS.matches(path)) {
+            final Tweet tweet = TweetData.parse(messageEvent.getData());
+            onSuccessfulReadLater(context, tweet);
+        } else if (Constants.DataPath.RESULT_READ_IT_LATER_FAILURE.matches(path)) {
+            Log.w(TAG, "Read later failed");
+            final String message = context.getString(R.string.read_later_failure);
+            FinishingConfirmationActivity.show(context, false, message);
         }
     }
 
@@ -98,6 +105,16 @@ public class MessageHandler {
         Log.d(TAG, "Failed to post a tweet");
 
         PostTweetActivity.notifyTaskFinished(context);
+    }
+
+    private static void onSuccessfulReadLater(final Context context, final Tweet tweet) {
+        final String message = context.getString(R.string.read_later_successful);
+        FinishingConfirmationActivity.show(context, true, message);
+
+        Log.d(TAG, String.format("Read later successful for @%s - %s",
+                tweet.getUser().getScreenName(), tweet.getText()));
+
+        TweetNotification.send(context, tweet);
     }
 
 }

@@ -10,7 +10,10 @@
     </style>
 
     <style name="ItemDescription" parent="android:TextAppearance.DeviceDefault.Medium">
+    </style>
 
+    <style name="FlatButton" parent="AppTheme">
+        <item name="android:background">#9090FF</item>
     </style>
 
 </resources>

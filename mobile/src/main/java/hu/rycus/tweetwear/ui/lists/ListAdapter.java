@@ -27,7 +27,7 @@ import hu.rycus.tweetwear.twitter.client.ITwitterClient;
 
 public class ListAdapter extends BaseAdapter {
 
-    private static final String TAG = ListAdapter.class.getSimpleName();
+    private static final String TAG = "lists." + ListAdapter.class.getSimpleName();
 
     private static final String KEY_PREFIX = ListAdapter.class.getCanonicalName();
     private static final String KEY_CONTENTS = KEY_PREFIX + ".contents";

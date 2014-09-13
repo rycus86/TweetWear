@@ -2,7 +2,6 @@
 <resources>
 
     <string name="refresh_default_value" translatable="false">1800000</string>
-
     <string-array name="refresh_interval_values" translatable="false">
         <item>900000</item>
         <item>1800000</item>
@@ -12,5 +11,9 @@
         <item>21600000</item>
         <item>43200000</item>
     </string-array>
+
+    <string name="infinity_sign" translatable="false">&#8734;</string>
+
+    <string name="debug_delete_database" translatable="false">Delete database</string>
 
 </resources>

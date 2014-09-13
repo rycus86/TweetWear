@@ -70,6 +70,8 @@ public class Tweet implements Comparable<Tweet> {
 
     /** This field is not part of the official Twitter API. */
     private boolean ownTweet;
+    /** This field is not part of the official Twitter API. */
+    private boolean savedToReadLater = false;
 
     @Override
     public int compareTo(final Tweet another) {

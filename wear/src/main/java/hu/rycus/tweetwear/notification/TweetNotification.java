@@ -16,7 +16,9 @@ import hu.rycus.tweetwear.common.model.entities.Hashtag;
 import hu.rycus.tweetwear.common.model.entities.Media;
 import hu.rycus.tweetwear.common.model.entities.Url;
 import hu.rycus.tweetwear.common.model.entities.UserMention;
+import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.action.FavoriteAction;
+import hu.rycus.tweetwear.notification.action.ReadItLaterAction;
 import hu.rycus.tweetwear.notification.action.ReplyAction;
 import hu.rycus.tweetwear.notification.action.RetweetAction;
 
@@ -38,18 +40,14 @@ public class TweetNotification {
     }
 
     private static Notification build(final Context context, final Tweet tweet) {
-        String content = tweet.getText();
-        if (tweet.getEntities() != null) {
-            content = processEntities(tweet, content);
-        }
+        final TweetData tweetData = TweetData.of(tweet);
 
-        final String title = getTitle(tweet);
-        final String timestamp = getTimestamp(tweet);
-        final Spanned contentHtml = getHtmlContent(content, tweet.getUser().getName(), timestamp);
+        final Spanned contentHtml = getHtmlContent(
+                tweetData.toFormattedHtml(), tweet.getUser().getName(), tweetData.getTimestamp());
 
         return new Notification.Builder(context)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(title)
+                .setContentTitle(tweetData.getTitle())
                 .setSortKey(getSortKey(tweet))
                 .setStyle(new Notification.BigTextStyle().bigText(contentHtml))
                 .setGroup(NotificationConstants.Group.TWEETS.get())
@@ -127,6 +125,8 @@ public class TweetNotification {
 
         final Notification.WearableExtender extender = new Notification.WearableExtender();
 
+        addReadLaterActions(context, tweet, extender);
+
         if (!tweet.isOwnTweet()) {
             extender.addAction(new RetweetAction().build(context, tweet));
         }
@@ -135,6 +135,20 @@ public class TweetNotification {
         extender.addAction(new ReplyAction().build(context, tweet));
 
         return extender;
+    }
+
+    private static void addReadLaterActions(final Context context, final Tweet tweet,
+                                            final Notification.WearableExtender extender) {
+        final Entities entities = tweet.getEntities();
+        if (entities != null) {
+            final Url[] urls = entities.getUrls();
+            if (urls != null) {
+                for (final Url url : urls) {
+                    final ReadItLaterAction action = new ReadItLaterAction(url);
+                    extender.addAction(action.build(context, tweet));
+                }
+            }
+        }
     }
 
 }

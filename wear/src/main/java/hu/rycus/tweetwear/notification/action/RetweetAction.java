@@ -30,7 +30,13 @@ public class RetweetAction extends BaseTweetAction {
 
     @Override
     protected PendingIntent getPendingIntent(final Context context, final Tweet tweet) {
-        return getPendingIntentForService(context, tweet, Constants.ACTION_SEND_RETWEET);
+        final String action;
+        if (tweet.isRetweeted()) {
+            action = Constants.ACTION_DO_NOTHING;
+        } else {
+            action = Constants.ACTION_SEND_RETWEET;
+        }
+        return getPendingIntentForService(context, tweet, action);
     }
 
 }

@@ -1,23 +1,38 @@
 package hu.rycus.tweetwear;
 
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.scribe.model.Token;
 
 import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.database.TweetWearDatabase;
 import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.ril.ReadItLater;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
+import hu.rycus.tweetwear.ui.ReadItLaterActivity;
 import hu.rycus.tweetwear.ui.SettingsHelper;
 
 public class SettingsActivity extends PreferenceActivity
@@ -25,10 +40,15 @@ public class SettingsActivity extends PreferenceActivity
 
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
+    private static final long ACTION_BAR_VIBRATION_DURATION = 50L;
+
     private final SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener =
             SettingsHelper.createPreferenceListener(this);
 
     private Preference accountItem;
+
+    private TextView txtReadLaterCount;
+    private int readLaterCount;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -51,15 +71,48 @@ public class SettingsActivity extends PreferenceActivity
         getSharedPreferences(Preferences.PREFERENCES_NAME, MODE_PRIVATE)
             .registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
+        final IntentFilter filter = new IntentFilter(Constants.ACTION_BROADCAST_READ_IT_LATER);
+        LocalBroadcastManager.getInstance(this).registerReceiver(readLaterBroadcastReceiver, filter);
+
         // refresh lists summary, maybe we just came back from lists settings
         SettingsHelper.setupLists(this);
+
+        loadReadLaterCount();
     }
 
     @Override
     protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(readLaterBroadcastReceiver);
+
         getSharedPreferences(Preferences.PREFERENCES_NAME, MODE_PRIVATE)
                 .unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+
         super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        final MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_settings, menu);
+        setupReadLaterMenu(menu);
+        setupDeleteDatabaseMenuItem(menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(final MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_read_later: {
+                onReadLaterItemSelected();
+                return true;
+            }
+            case R.id.debug_delete_database: {
+                onDeleteDatabaseSelected();
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @SuppressWarnings("deprecation")
@@ -185,6 +238,104 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public void onAccessTokenError() {
         Toast.makeText(this, R.string.error_access_token_save, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setupReadLaterMenu(final Menu menu) {
+        final int id = R.id.menu_read_later;
+        final MenuItem item = menu.findItem(id);
+
+        final View view = item.getActionView();
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                menu.performIdentifierAction(id, 0);
+            }
+        });
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(final View v) {
+                final Toast toast = Toast
+                        .makeText(v.getContext(), item.getTitle(), Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP | Gravity.END, v.getWidth() / 2, v.getHeight());
+                toast.show();
+
+                vibrate(ACTION_BAR_VIBRATION_DURATION);
+
+                return true;
+            }
+        });
+
+        txtReadLaterCount = (TextView) view.findViewById(R.id.txt_read_later_count);
+
+        loadReadLaterCount();
+    }
+
+    private void loadReadLaterCount() {
+        if (!skipLoadingReadLaterCount()) {
+            final LoadReadLaterCountTask task = new LoadReadLaterCountTask();
+            task.execute();
+        }
+    }
+
+    private boolean skipLoadingReadLaterCount() {
+        return txtReadLaterCount == null;
+    }
+
+    private void setReadLaterCount(final int count) {
+        readLaterCount = count;
+        txtReadLaterCount.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+        if (count > 99) {
+            txtReadLaterCount.setText(R.string.infinity_sign);
+        } else {
+            txtReadLaterCount.setText(Integer.toString(count));
+        }
+    }
+
+    private void onReadLaterItemSelected() {
+        if (readLaterCount > 0) {
+            startActivity(new Intent(this, ReadItLaterActivity.class));
+        } else {
+            Toast.makeText(this, getString(R.string.read_later_empty), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void vibrate(final long duration) {
+        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vibrator.vibrate(duration);
+    }
+
+    private void setupDeleteDatabaseMenuItem(final Menu menu) {
+        final boolean active = BuildConfig.DEBUG;
+        final MenuItem item = menu.findItem(R.id.debug_delete_database);
+        item.setEnabled(active);
+        item.setVisible(active);
+    }
+
+    private void onDeleteDatabaseSelected() {
+        deleteDatabase(TweetWearDatabase.getName());
+        finish();
+    }
+
+    private final BroadcastReceiver readLaterBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(final Context context, final Intent intent) {
+            if (Constants.ACTION_BROADCAST_READ_IT_LATER.equals(intent.getAction())) {
+                loadReadLaterCount();
+            }
+        }
+    };
+
+    private class LoadReadLaterCountTask extends AsyncTask<Void, Void, Integer> {
+        @Override
+        protected Integer doInBackground(final Void... params) {
+            return ReadItLater.count(SettingsActivity.this);
+        }
+
+        @Override
+        protected void onPostExecute(final Integer count) {
+            setReadLaterCount(count);
+        }
+
     }
 
 }

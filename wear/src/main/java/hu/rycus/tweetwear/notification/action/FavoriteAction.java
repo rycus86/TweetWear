@@ -30,7 +30,13 @@ public class FavoriteAction extends BaseTweetAction {
 
     @Override
     protected PendingIntent getPendingIntent(final Context context, final Tweet tweet) {
-        return getPendingIntentForService(context, tweet, Constants.ACTION_SEND_FAVORITE);
+        final String action;
+        if (tweet.isFavorited()) {
+            action = Constants.ACTION_DO_NOTHING;
+        } else {
+            action = Constants.ACTION_SEND_FAVORITE;
+        }
+        return getPendingIntentForService(context, tweet, action);
     }
 
 }

@@ -31,4 +31,9 @@
         <item quantity="other">%d nuevos tweets</item>
     </plurals>
 
+    <string name="read_later">Leer mas tarde</string>
+    <string name="read_later_saved">Guardado</string>
+    <string name="read_later_successful">Guardar para leer mas tarde</string>
+    <string name="read_later_failure">Fallo el leer el link</string>
+
 </resources>
