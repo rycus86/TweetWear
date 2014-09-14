@@ -5,7 +5,8 @@ public interface NotificationConstants {
     enum Tag {
 
         TWEET("tweet/%"),
-        SUMMARY("tweets/summary");
+        SUMMARY("tweets/summary"),
+        PROMOTION("promotion/%");
 
         private final String value;
 
@@ -26,7 +27,8 @@ public interface NotificationConstants {
     enum Id {
 
         TWEET(1),
-        SUMMARY(2);
+        SUMMARY(2),
+        PROMOTION(3);
 
         private final int value;
 

@@ -34,6 +34,7 @@ public interface Constants {
         POST_REPLY("/post/reply/%"),
         MARK_AS_READ("/mark/as/read"),
         READ_IT_LATER("/read/it/later/%"),
+        PROMOTION("/promotion/%"),
         RESULT_RETWEET_SUCCESS("/retweet/%/success"),
         RESULT_RETWEET_FAILURE("/retweet/%/failure"),
         RESULT_FAVORITE_SUCCESS("/favorite/%/success"),

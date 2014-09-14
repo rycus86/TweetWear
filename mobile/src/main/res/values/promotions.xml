@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="promo_read_later" translatable="false">
+        <b>Read It Later</b>:
+        You can now save links from Tweets
+        and read them on your phone later.
+    </string>
+
+</resources>

@@ -36,4 +36,6 @@
     <string name="read_later_successful">Сохранено для дальнейшего прочтения</string>
     <string name="read_later_failure">Ошибка сохранения</string>
 
+    <string name="promo_title">Что нового?</string>
+
 </resources>

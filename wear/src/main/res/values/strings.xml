@@ -36,4 +36,6 @@
     <string name="read_later_successful">Saved to read later</string>
     <string name="read_later_failure">Failed to save link</string>
 
+    <string name="promo_title">What\'s new?</string>
+
 </resources>

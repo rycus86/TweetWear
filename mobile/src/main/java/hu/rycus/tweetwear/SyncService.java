@@ -20,8 +20,10 @@ import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.promo.Promotions;
 import hu.rycus.tweetwear.tasks.ClearExistingTweetsTask;
 import hu.rycus.tweetwear.tasks.FetchTweetsTask;
+import hu.rycus.tweetwear.tasks.SendPromotionTask;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.account.Account;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
@@ -58,7 +60,8 @@ public class SyncService extends Service {
             } else if (Constants.ACTION_CANCEL_ALARM.equals(intent.getAction())) {
                 cancelTask();
             } else if (Constants.ACTION_START_SYNC.equals(intent.getAction())) {
-                requestFetchTimeline();
+                requestSendPromotionIfNeeded();
+                requestFetchTweets();
             } else if (Constants.ACTION_CLEAR_EXISTING.equals(intent.getAction())) {
                 requestClearExistingTweets();
             } else {
@@ -86,7 +89,13 @@ public class SyncService extends Service {
         manager.cancel(scheduledIntent);
     }
 
-    private void requestFetchTimeline() {
+    private void requestSendPromotionIfNeeded() {
+        if (Promotions.shouldShowPromotion(this)) {
+            ApiClientHelper.runAsynchronously(this, new SendPromotionTask());
+        }
+    }
+
+    private void requestFetchTweets() {
         final IAccountProvider provider = TwitterFactory.createProvider();
         final ITwitterClient twitterClient = TwitterFactory.createClient();
         ApiClientHelper.runAsynchronously(this, new FetchTweetsTask(provider, twitterClient));

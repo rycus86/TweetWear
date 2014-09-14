@@ -27,6 +27,7 @@ import org.scribe.model.Token;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.database.TweetWearDatabase;
 import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.promo.Promotions;
 import hu.rycus.tweetwear.ril.ReadItLater;
 import hu.rycus.tweetwear.twitter.TwitterFactory;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
@@ -78,10 +79,14 @@ public class SettingsActivity extends PreferenceActivity
         SettingsHelper.setupLists(this);
 
         loadReadLaterCount();
+
+        Promotions.showDialogIfNeeded(this);
     }
 
     @Override
     protected void onPause() {
+        Promotions.dismissDialog();
+
         LocalBroadcastManager.getInstance(this).unregisterReceiver(readLaterBroadcastReceiver);
 
         getSharedPreferences(Preferences.PREFERENCES_NAME, MODE_PRIVATE)
