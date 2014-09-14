@@ -146,15 +146,44 @@ public class ReadItLater {
         }
     }
 
+    public static int deleteAll(final Context context) {
+        final SQLiteDatabase db = helper(context).getWritableDatabase();
+        try {
+            final int deleted = db.delete(TABLE_NAME, null, null);
+            if (deleted > 0) {
+                onAllSavedReadLaterStateDeleted(context);
+            }
+            return deleted;
+        } finally {
+            db.close();
+        }
+    }
+
     private static void onSavedReadLaterStateDeleted(final Context context, final Tweet tweet) {
         ApiClientHelper.runAsynchronously(context, new ApiClientRunnable() {
             @Override
             protected void run(final Context context,
                                final GoogleApiClient apiClient) throws Exception {
-                tweet.setSavedToReadLater(false);
-                TweetData.of(tweet).sendAsync(apiClient);
+                resetSavedToReadLaterState(tweet, apiClient);
             }
         });
+    }
+
+    private static void onAllSavedReadLaterStateDeleted(final Context context) {
+        ApiClientHelper.runAsynchronously(context, new ApiClientRunnable() {
+            @Override
+            protected void run(final Context context, final GoogleApiClient apiClient) throws Exception {
+                final Collection<Tweet> tweets = TweetData.loadAll(apiClient);
+                for (final Tweet tweet : tweets) {
+                    resetSavedToReadLaterState(tweet, apiClient);
+                }
+            }
+        });
+    }
+
+    private static void resetSavedToReadLaterState(final Tweet tweet, final GoogleApiClient apiClient) {
+        tweet.setSavedToReadLater(false);
+        TweetData.of(tweet).sendAsync(apiClient);
     }
 
     private static TweetWearDatabase helper(final Context context) {

@@ -69,6 +69,7 @@
 
     <string name="read_later">Прочитать позже</string>
     <string name="read_later_empty">Нет сохраненного для дальнейшего прочтения</string>
+    <string name="menu_delete_all">Удалить все</string>
 
     <string name="promo_title">Что нового</string>
 

@@ -69,6 +69,7 @@
 
     <string name="read_later">Read it later</string>
     <string name="read_later_empty">No pages saved</string>
+    <string name="menu_delete_all">Delete all</string>
 
     <string name="promo_title">What\'s new?</string>
 
