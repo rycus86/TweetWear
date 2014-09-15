@@ -7,15 +7,10 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
-import java.text.DateFormat;
-
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.entities.Entities;
-import hu.rycus.tweetwear.common.model.entities.Hashtag;
-import hu.rycus.tweetwear.common.model.entities.Media;
 import hu.rycus.tweetwear.common.model.entities.Url;
-import hu.rycus.tweetwear.common.model.entities.UserMention;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.action.FavoriteAction;
 import hu.rycus.tweetwear.notification.action.ReadItLaterAction;
@@ -53,58 +48,6 @@ public class TweetNotification {
                 .setGroup(NotificationConstants.Group.TWEETS.get())
                 .extend(createActionExtender(context, tweet))
                 .build();
-    }
-    
-    private static String processEntities(final Tweet tweet, final String originalContent) {
-        final Entities entities = tweet.getEntities();
-
-        String content = originalContent;
-        
-        if (entities.getHashtags() != null) {
-            for (final Hashtag hashtag : entities.getHashtags()) {
-                content = content.replace("#" + hashtag.getText(),
-                        String.format("<i>#<b>%s</b></i>", hashtag.getText()));
-            }
-        }
-
-        if (entities.getUrls() != null) {
-            for (final Url url : entities.getUrls()) {
-                content = content.replace(url.getUrl(),
-                        String.format("<font color='#0099FF'><i>%s</i></font>",
-                                url.getDisplayUrl()));
-            }
-        }
-
-        if (entities.getMedia() != null) {
-            for (final Media media : entities.getMedia()) {
-                content = content.replace(media.getUrl(), "");
-            }
-        }
-
-        if (entities.getUserMentions() != null) {
-            for (final UserMention mention : entities.getUserMentions()) {
-                content = content.replace(
-                        String.format("@%s", mention.getScreenName()),
-                        String.format("<font color='#0033CC'><i>@%s</i></font>",
-                                mention.getName()));
-            }
-        }
-        
-        return content;
-    }
-
-    private static String getTitle(final Tweet tweet) {
-        if (tweet.getRetweetedStatus() != null) {
-            return "@" + tweet.getRetweetedStatus().getUser().getScreenName();
-        } else {
-            return "@" + tweet.getUser().getScreenName();
-        }
-    }
-
-    private static String getTimestamp(final Tweet tweet) {
-        final DateFormat dateFormat = DateFormat.getDateTimeInstance(
-                DateFormat.SHORT, DateFormat.SHORT);
-        return dateFormat.format(tweet.getCreatedAt());
     }
 
     private static Spanned getHtmlContent(final String rawContent, final String username,
