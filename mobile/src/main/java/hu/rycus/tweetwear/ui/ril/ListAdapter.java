@@ -13,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.makeramen.RoundedImageView;
 import com.squareup.picasso.Picasso;
@@ -70,7 +71,9 @@ public class ListAdapter extends BaseAdapter {
             viewHolder.btnOpen = findView(view, R.id.btn_open);
             view.setTag(viewHolder);
 
+            viewHolder.btnOpen.setHapticFeedbackEnabled(true);
             viewHolder.btnOpen.setOnClickListener(openListener);
+            viewHolder.btnOpen.setOnLongClickListener(openHintListener);
         }
 
         final SavedPage page = (SavedPage) getItem(position);
@@ -174,6 +177,17 @@ public class ListAdapter extends BaseAdapter {
             } catch (Exception ex) {
                 Log.e(TAG, String.format("Failed to open link: %s", link), ex);
             }
+        }
+    };
+
+    private final View.OnLongClickListener openHintListener = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(final View v) {
+            final Context context = v.getContext();
+            final CharSequence title = v.getContentDescription();
+            Toast.makeText(context, title, Toast.LENGTH_SHORT).show();
+
+            return true;
         }
     };
 

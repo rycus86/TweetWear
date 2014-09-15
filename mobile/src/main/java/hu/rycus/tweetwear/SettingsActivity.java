@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,8 +39,6 @@ public class SettingsActivity extends PreferenceActivity
         implements UsernameCallback, AccessLevelCallback, AccessTokenCallback {
 
     private static final String TAG = SettingsActivity.class.getSimpleName();
-
-    private static final long ACTION_BAR_VIBRATION_DURATION = 50L;
 
     private final SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener =
             SettingsHelper.createPreferenceListener(this);
@@ -250,6 +247,7 @@ public class SettingsActivity extends PreferenceActivity
         final MenuItem item = menu.findItem(id);
 
         final View view = item.getActionView();
+        view.setHapticFeedbackEnabled(true);
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -263,8 +261,6 @@ public class SettingsActivity extends PreferenceActivity
                         .makeText(v.getContext(), item.getTitle(), Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.TOP | Gravity.END, v.getWidth() / 2, v.getHeight());
                 toast.show();
-
-                vibrate(ACTION_BAR_VIBRATION_DURATION);
 
                 return true;
             }
@@ -302,11 +298,6 @@ public class SettingsActivity extends PreferenceActivity
         } else {
             Toast.makeText(this, getString(R.string.read_later_empty), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void vibrate(final long duration) {
-        final Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        vibrator.vibrate(duration);
     }
 
     private void setupDeleteDatabaseMenuItem(final Menu menu) {
