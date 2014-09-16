@@ -3,6 +3,7 @@ package hu.rycus.tweetwear.notification.action;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.text.Html;
 
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.model.Tweet;
@@ -25,7 +26,9 @@ public class ShowImageAction extends BaseTweetAction {
 
     @Override
     protected CharSequence getTitle(final Context context, final Tweet tweet) {
-        return context.getString(R.string.show_image);
+        final String title = context.getString(R.string.show_image);
+        return Html.fromHtml(String.format(
+                "%s<br/><small>%s</small>", title, media.getDisplayUrl()));
     }
 
     @Override
