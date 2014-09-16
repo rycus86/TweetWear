@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#234">
+
+    <FrameLayout
+        android:id="@+id/media_loading_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            style="@android:style/Widget.Holo.Light.ProgressBar.Large"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="48dp"
+            android:padding="5dp"
+            android:text="Loading image..."
+            android:textColor="@android:color/primary_text_dark"
+            android:background="@drawable/rounded_text_bg"
+            />
+
+    </FrameLayout>
+
+    <ImageView android:id="@+id/img_media"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:scaleType="fitCenter"
+               android:alpha="1"/>
+
+</FrameLayout>

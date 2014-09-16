@@ -27,6 +27,8 @@ import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.common.model.entities.Entities;
 import hu.rycus.tweetwear.common.model.entities.Hashtag;
 import hu.rycus.tweetwear.common.model.entities.Media;
+import hu.rycus.tweetwear.common.model.entities.Size;
+import hu.rycus.tweetwear.common.model.entities.Sizes;
 import hu.rycus.tweetwear.common.model.entities.Url;
 import hu.rycus.tweetwear.common.model.entities.UserMention;
 
@@ -135,18 +137,25 @@ public final class TweetData {
             }
         }
 
-        if (entities.getMedia() != null) {
-            for (final Media media : entities.getMedia()) {
-                content = content.replace(media.getUrl(), "");
-            }
-        }
-
         if (entities.getUserMentions() != null) {
             for (final UserMention mention : entities.getUserMentions()) {
                 content = content.replace(
                         String.format("@%s", mention.getScreenName()),
                         String.format("<font color='#0033CC'><i>@%s</i></font>",
                                 mention.getName()));
+            }
+        }
+
+        if (entities.getMedia() != null) {
+            boolean showMediaIndicator = false;
+
+            for (final Media media : entities.getMedia()) {
+                content = content.replace(media.getUrl(), "");
+                showMediaIndicator = true;
+            }
+
+            if (showMediaIndicator) {
+                content += " <small><i>{x}</i></small>";
             }
         }
 
@@ -210,15 +219,31 @@ public final class TweetData {
     };
 
     public static Tweet demo(final long id) {
-        Tweet tweet = new Tweet();
-        User user = new User();
+        final Tweet tweet = new Tweet();
+        final User user = new User();
         user.setId(1234);
         user.setName("User name");
         user.setScreenName("ScreenName");
         tweet.setUser(user);
         tweet.setCreatedAt(new Date());
         tweet.setId(id);
-        tweet.setText("Test demo tweet");
+        tweet.setText("Test demo tweet t.co/abcd");
+        final Media media = new Media();
+        media.setId(12345);
+        media.setUrl("t.co/abcd");
+        media.setDisplayUrl("t.co/image");
+        media.setMediaUrl("http://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
+        media.setMediaUrlHttps("https://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
+        final Size size = new Size();
+        size.setWidth(280);
+        size.setHeight(280);
+        size.setResize(Size.Resize.FIT);
+        final Sizes sizes = new Sizes();
+        sizes.setSmall(size);
+        media.setSizes(sizes);
+        final Entities entities = new Entities();
+        entities.setMedia(new Media[] { media });
+        tweet.setEntities(entities);
         return tweet;
     }
 

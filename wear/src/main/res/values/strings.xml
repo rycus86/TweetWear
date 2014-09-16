@@ -38,4 +38,7 @@
 
     <string name="promo_title">What\'s new?</string>
 
+    <string name="show_image">Show image</string>
+    <string name="show_image_failure">Failed to download image</string>
+
 </resources>

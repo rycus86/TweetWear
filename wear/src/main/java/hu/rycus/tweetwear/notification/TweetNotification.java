@@ -10,9 +10,11 @@ import android.util.Log;
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.entities.Entities;
+import hu.rycus.tweetwear.common.model.entities.Media;
 import hu.rycus.tweetwear.common.model.entities.Url;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.action.FavoriteAction;
+import hu.rycus.tweetwear.notification.action.ShowImageAction;
 import hu.rycus.tweetwear.notification.action.ReadItLaterAction;
 import hu.rycus.tweetwear.notification.action.ReplyAction;
 import hu.rycus.tweetwear.notification.action.RetweetAction;
@@ -68,6 +70,7 @@ public class TweetNotification {
 
         final Notification.WearableExtender extender = new Notification.WearableExtender();
 
+        addShowImageActions(context, tweet, extender);
         addReadLaterActions(context, tweet, extender);
 
         if (!tweet.isOwnTweet()) {
@@ -78,6 +81,20 @@ public class TweetNotification {
         extender.addAction(new ReplyAction().build(context, tweet));
 
         return extender;
+    }
+
+    private static void addShowImageActions(final Context context, final Tweet tweet,
+                                            final Notification.WearableExtender extender) {
+        final Entities entities = tweet.getEntities();
+        if (entities != null) {
+            final Media[] medias = entities.getMedia();
+            if (medias != null) {
+                for (final Media media : medias) {
+                    final ShowImageAction action = new ShowImageAction(media);
+                    extender.addAction(action.build(context, tweet));
+                }
+            }
+        }
     }
 
     private static void addReadLaterActions(final Context context, final Tweet tweet,

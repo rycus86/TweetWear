@@ -6,14 +6,17 @@ import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
+import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.payload.ReadItLaterData;
 import hu.rycus.tweetwear.common.util.Constants;
+import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.tasks.ClearExistingTweetsTask;
 import hu.rycus.tweetwear.tasks.FavoriteTask;
 import hu.rycus.tweetwear.tasks.PostTweetTask;
 import hu.rycus.tweetwear.tasks.ReadItLaterTask;
 import hu.rycus.tweetwear.tasks.RetweetTask;
+import hu.rycus.tweetwear.tasks.ShowImageTask;
 
 public class MessageListenerService extends WearableListenerService {
 
@@ -22,21 +25,28 @@ public class MessageListenerService extends WearableListenerService {
     @Override
     public void onMessageReceived(final MessageEvent messageEvent) {
         final String path = messageEvent.getPath();
-        if (Constants.DataPath.RETWEET.matches(path)) {
-            processRetweet(path);
-        } else if (Constants.DataPath.FAVORITE.matches(path)) {
-            processFavorite(path);
-        } else if (Constants.DataPath.POST_NEW_TWEET.matches(path)) {
-            final String text = new String(messageEvent.getData());
-            processPostNewTweet(text);
-        } else if (Constants.DataPath.POST_REPLY.matches(path)) {
-            final String text = new String(messageEvent.getData());
-            processPostReply(path, text);
-        } else if (Constants.DataPath.MARK_AS_READ.matches(path)) {
-            processMarkAsRead();
-        } else if (Constants.DataPath.READ_IT_LATER.matches(path)) {
-            final ReadItLaterData data = ReadItLaterData.parse(messageEvent.getData());
-            processReadItLater(data);
+        try {
+            if (Constants.DataPath.RETWEET.matches(path)) {
+                processRetweet(path);
+            } else if (Constants.DataPath.FAVORITE.matches(path)) {
+                processFavorite(path);
+            } else if (Constants.DataPath.POST_NEW_TWEET.matches(path)) {
+                final String text = new String(messageEvent.getData());
+                processPostNewTweet(text);
+            } else if (Constants.DataPath.POST_REPLY.matches(path)) {
+                final String text = new String(messageEvent.getData());
+                processPostReply(path, text);
+            } else if (Constants.DataPath.MARK_AS_READ.matches(path)) {
+                processMarkAsRead();
+            } else if (Constants.DataPath.READ_IT_LATER.matches(path)) {
+                final ReadItLaterData data = ReadItLaterData.parse(messageEvent.getData());
+                processReadItLater(data);
+            } else if (Constants.DataPath.SHOW_IMAGE.matches(path)) {
+                final Tweet tweet = TweetData.parse(messageEvent.getData());
+                processShowImage(tweet, path);
+            }
+        } catch (Exception ex) {
+            Log.d(TAG, String.format("Failed to process message with path: %s", path), ex);
         }
     }
 
@@ -89,6 +99,16 @@ public class MessageListenerService extends WearableListenerService {
         Log.d(TAG, String.format("Received read later request for url: %s", data.getUrl()));
 
         final ReadItLaterTask task = new ReadItLaterTask(data);
+        ApiClientHelper.runAsynchronously(this, task);
+    }
+
+    private void processShowImage(final Tweet tweet, final String path) {
+        final String strMediaId = Constants.DataPath.SHOW_IMAGE.replace(path, "$1");
+        final long mediaId = Long.parseLong(strMediaId);
+
+        Log.d(TAG, String.format("Received show image request to id: %d", mediaId));
+
+        final ShowImageTask task = new ShowImageTask(tweet, mediaId);
         ApiClientHelper.runAsynchronously(this, task);
     }
 
