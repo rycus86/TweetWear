@@ -10,9 +10,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 
 import hu.rycus.tweetwear.R;
@@ -23,9 +30,14 @@ import hu.rycus.tweetwear.ril.SavedPage;
 
 public class ListFragment extends android.app.ListFragment {
 
+    private static final String TAG = "ril." + ListFragment.class.getSimpleName();
+
     private static final String KEY_PREFIX = ListFragment.class.getCanonicalName();
     private static final String KEY_STATE_FIRST_POS = KEY_PREFIX + ".firstPos";
     private static final String KEY_STATE_TOP = KEY_PREFIX + ".top";
+
+    private static final long ANIMATION_DURATION = 500;
+    private static final long ANIMATION_OFFSET = 150;
 
     private Activity activity;
     private ListAdapter listAdapter;
@@ -102,6 +114,62 @@ public class ListFragment extends android.app.ListFragment {
 
         outState.putInt(KEY_STATE_FIRST_POS, firstPosition);
         outState.putInt(KEY_STATE_TOP, top);
+    }
+
+    public void animateActivityFinishing(final Activity activity) {
+        Log.d(TAG, "Animating activity finish");
+
+        final ListView listView = getListView();
+        final int visibleChildCount = listView.getChildCount();
+
+        Animation lastAnimation = null;
+
+        for (int index = 0; index < visibleChildCount; index++) {
+            final View view = listView.getChildAt(index);
+            final Animation animation = createAnimation(index);
+
+            view.startAnimation(animation);
+
+            lastAnimation = animation;
+        }
+
+        if (lastAnimation != null) {
+            lastAnimation.setAnimationListener(createFinishingListener(activity));
+        }
+    }
+
+    private Animation createAnimation(final int offset) {
+        final TranslateAnimation slideOutAnimation = new TranslateAnimation(
+                Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 1f,
+                Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f);
+        slideOutAnimation.setDuration(ANIMATION_DURATION);
+        slideOutAnimation.setInterpolator(new AccelerateInterpolator());
+
+        final AlphaAnimation fadeOutAnimation = new AlphaAnimation(1f, 0f);
+        fadeOutAnimation.setDuration(ANIMATION_DURATION);
+        fadeOutAnimation.setInterpolator(new LinearInterpolator());
+
+        final AnimationSet animationSet = new AnimationSet(false);
+        animationSet.addAnimation(slideOutAnimation);
+        animationSet.addAnimation(fadeOutAnimation);
+        animationSet.setStartOffset(offset * ANIMATION_OFFSET);
+        animationSet.setFillAfter(true);
+        return animationSet;
+    }
+
+    private Animation.AnimationListener createFinishingListener(final Activity activity) {
+        return new Animation.AnimationListener() {
+            @Override
+            public void onAnimationEnd(final Animation animation) {
+                Log.d(TAG, "Finishing parent activity");
+                activity.finish();
+            }
+
+            @Override
+            public void onAnimationStart(final Animation animation) { }
+            @Override
+            public void onAnimationRepeat(final Animation animation) { }
+        };
     }
 
     private SwipeDismissListViewTouchListener createSwipeDismissListener(final ListView listView) {

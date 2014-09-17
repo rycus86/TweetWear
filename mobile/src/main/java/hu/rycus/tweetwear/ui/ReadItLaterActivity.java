@@ -3,6 +3,7 @@ package hu.rycus.tweetwear.ui;
 import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -12,6 +13,8 @@ import hu.rycus.tweetwear.ril.ReadItLater;
 import hu.rycus.tweetwear.ui.ril.ListFragment;
 
 public class ReadItLaterActivity extends Activity {
+
+    private static final String TAG = ReadItLaterActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -47,7 +50,18 @@ public class ReadItLaterActivity extends Activity {
 
     private void onDeleteSavedReadLaterPages() {
         ReadItLater.deleteAll(this);
-        finish();
+
+        final ListFragment fragment = findListFragment();
+        if (fragment != null) {
+            fragment.animateActivityFinishing(this);
+        } else {
+            Log.d(TAG, "Fragment not found, simply finishing");
+            finish();
+        }
+    }
+
+    private ListFragment findListFragment() {
+        return (ListFragment) getFragmentManager().findFragmentById(R.id.container);
     }
 
 }
