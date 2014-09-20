@@ -66,6 +66,16 @@
             android:gravity="end">
 
             <ImageButton
+                android:id="@+id/btn_archive"
+                android:layout_width="40dp"
+                android:layout_height="32dp"
+                android:padding="2dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_archive"
+                android:background="@drawable/flat_button"
+                android:contentDescription="@string/archive_page"/>
+
+            <ImageButton
                 android:id="@+id/btn_open"
                 android:layout_width="40dp"
                 android:layout_height="32dp"
@@ -85,6 +95,13 @@
         android:layout_height="48dp"
         android:layout_gravity="top|end"
         android:src="@drawable/unread_page_overlay"/>
+
+    <ImageView
+        android:id="@+id/img_archive_overlay"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:src="@drawable/archive_page_overlay"/>
 
     <View
         android:layout_width="match_parent"

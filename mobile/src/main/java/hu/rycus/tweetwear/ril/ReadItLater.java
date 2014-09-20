@@ -22,7 +22,8 @@ import hu.rycus.tweetwear.database.TweetWearDatabase;
 
 public class ReadItLater {
 
-    private static final String TABLE_NAME = "read_it_later";
+    private static final String TABLE_NAME_MAIN = "read_it_later";
+    private static final String TABLE_NAME_ARCHIVE = "read_it_later_archive";
 
     private static final String COLUMN_ID = BaseColumns._ID;
     private static final String COLUMN_LINK = "link";
@@ -30,34 +31,53 @@ public class ReadItLater {
     private static final String COLUMN_READ = "read";
     private static final String COLUMN_TIMESTAMP = "timestamp";
 
-    private static final String CREATE_TABLE_SQL =
-            "CREATE TABLE " + TABLE_NAME + " (" +
+    private static final String CREATE_TABLE_SQL_MAIN =
+            "CREATE TABLE " + TABLE_NAME_MAIN + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_LINK + " TEXT, " +
                     COLUMN_TWEET_JSON + " TEXT, " +
                     COLUMN_READ + " INTEGER, " +
                     COLUMN_TIMESTAMP + " INTEGER)";
 
+    private static final String CREATE_TABLE_SQL_ARCHIVE =
+            "CREATE TABLE " + TABLE_NAME_ARCHIVE + " (" +
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_LINK + " TEXT, " +
+                    COLUMN_TWEET_JSON + " TEXT, " +
+                    COLUMN_TIMESTAMP + " INTEGER)";
+
     private static final int BOOL_TRUE = 1;
     private static final int BOOL_FALSE = 0;
 
-    public static String getCreateTableSql() {
-        return CREATE_TABLE_SQL;
+    public static void onCreateDatabase(final SQLiteDatabase database) {
+        database.execSQL(CREATE_TABLE_SQL_MAIN);
+        database.execSQL(CREATE_TABLE_SQL_ARCHIVE);
+    }
+
+    public static void onUpgradeDatabase(final SQLiteDatabase database, final int oldVersion) {
+        if (oldVersion < 2) {
+            database.execSQL(CREATE_TABLE_SQL_ARCHIVE);
+        }
     }
 
     public static Collection<SavedPage> query(final Context context) {
-        return query(context, -1, -1);
+        return query(context, -1, -1, false);
     }
 
-    public static Collection<SavedPage> query(
-            final Context context, final int limit, final int offset) {
+    public static Collection<SavedPage> queryArchives(final Context context) {
+        return query(context, -1, -1, true);
+    }
+
+    private static Collection<SavedPage> query(
+        final Context context, final int limit, final int offset, boolean archive) {
         final SQLiteDatabase db = helper(context).getReadableDatabase();
         try {
+            final String tableName = archive ? TABLE_NAME_ARCHIVE : TABLE_NAME_MAIN;
             final String[] columns = {
                     COLUMN_ID,
                     COLUMN_LINK,
                     COLUMN_TWEET_JSON,
-                    COLUMN_READ,
+                    archive ? Integer.toString(BOOL_TRUE) : COLUMN_READ,
                     COLUMN_TIMESTAMP };
 
             final String orderBy = String.format("%s DESC", COLUMN_TIMESTAMP);
@@ -69,7 +89,7 @@ public class ReadItLater {
             }
 
             final Cursor cursor =
-                    db.query(TABLE_NAME, columns, null, null, null, null, orderBy, limitExpression);
+                    db.query(tableName, columns, null, null, null, null, orderBy, limitExpression);
             try {
                 if (cursor.moveToFirst()) {
                     final List<SavedPage> items = new ArrayList<SavedPage>(cursor.getCount());
@@ -82,7 +102,7 @@ public class ReadItLater {
                         final long timestamp = cursor.getLong(4);
 
                         final Tweet tweet = TweetData.parse(tweetJson);
-                        items.add(new SavedPage(id, link, tweet, timestamp, read));
+                        items.add(new SavedPage(id, link, tweet, timestamp, read, archive));
                     } while (cursor.moveToNext());
 
                     return items;
@@ -98,9 +118,17 @@ public class ReadItLater {
     }
 
     public static int count(final Context context) {
+        return count(context, TABLE_NAME_MAIN);
+    }
+
+    public static int countArchives(final Context context) {
+        return count(context, TABLE_NAME_ARCHIVE);
+    }
+
+    private static int count(final Context context, final String tableName) {
         final SQLiteDatabase db = helper(context).getReadableDatabase();
         try {
-            return (int) DatabaseUtils.queryNumEntries(db, TABLE_NAME);
+            return (int) DatabaseUtils.queryNumEntries(db, tableName);
         } finally {
             db.close();
         }
@@ -114,7 +142,7 @@ public class ReadItLater {
             values.put(COLUMN_TWEET_JSON, TweetData.of(tweet).toJson());
             values.put(COLUMN_READ, BOOL_FALSE);
             values.put(COLUMN_TIMESTAMP, System.currentTimeMillis());
-            return db.insert(TABLE_NAME, null, values);
+            return db.insert(TABLE_NAME_MAIN, null, values);
         } finally {
             db.close();
         }
@@ -126,19 +154,41 @@ public class ReadItLater {
             final String[] parameters = { Long.toString(id) };
             final ContentValues values = new ContentValues(1);
             values.put(COLUMN_READ, BOOL_TRUE);
-            return db.update(TABLE_NAME, values, COLUMN_ID + " = ?", parameters);
+            return db.update(TABLE_NAME_MAIN, values, COLUMN_ID + " = ?", parameters);
         } finally {
             db.close();
         }
     }
 
-    public static int delete(final Context context, final long id, final Tweet tweet) {
+    public static long archive(final Context context, final SavedPage page) {
         final SQLiteDatabase db = helper(context).getWritableDatabase();
         try {
-            final String[] parameters = {Long.toString(id)};
-            final int deleted = db.delete(TABLE_NAME, COLUMN_ID + " = ?", parameters);
-            if (deleted > 0) {
-                onSavedReadLaterStateDeleted(context, tweet);
+            final ContentValues values = new ContentValues(3);
+            values.put(COLUMN_LINK, page.getLink());
+            values.put(COLUMN_TWEET_JSON, TweetData.of(page.getTweet()).toJson());
+            values.put(COLUMN_TIMESTAMP, page.getTimestamp());
+
+            final long insertResult = db.insert(TABLE_NAME_ARCHIVE, null, values);
+            if (insertResult > 0) {
+                final long deleteResult = delete(context, page);
+                return Math.min(insertResult, deleteResult);
+            }
+        } finally {
+            db.close();
+        }
+
+        return -1;
+    }
+
+    public static int delete(final Context context, final SavedPage page) {
+        final SQLiteDatabase db = helper(context).getWritableDatabase();
+        try {
+            final String tableName =
+                    page.isArchive() ? TABLE_NAME_ARCHIVE : TABLE_NAME_MAIN;
+            final String[] parameters = {Long.toString(page.getId())};
+            final int deleted = db.delete(tableName, COLUMN_ID + " = ?", parameters);
+            if (!page.isArchive() && deleted > 0) {
+                onSavedReadLaterStateDeleted(context, page.getTweet());
             }
             return deleted;
         } finally {
@@ -147,9 +197,17 @@ public class ReadItLater {
     }
 
     public static int deleteAll(final Context context) {
+        return deleteAll(context, TABLE_NAME_MAIN);
+    }
+
+    public static int deleteAllArchives(final Context context) {
+        return deleteAll(context, TABLE_NAME_ARCHIVE);
+    }
+
+    private static int deleteAll(final Context context, final String tableName) {
         final SQLiteDatabase db = helper(context).getWritableDatabase();
         try {
-            final int deleted = db.delete(TABLE_NAME, null, null);
+            final int deleted = db.delete(tableName, null, null);
             if (deleted > 0) {
                 onAllSavedReadLaterStateDeleted(context);
             }

@@ -9,7 +9,7 @@ import hu.rycus.tweetwear.ril.ReadItLater;
 public class TweetWearDatabase extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "tweetwear.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2;
 
     public TweetWearDatabase(final Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -17,12 +17,12 @@ public class TweetWearDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(final SQLiteDatabase db) {
-        db.execSQL(ReadItLater.getCreateTableSql());
+        ReadItLater.onCreateDatabase(db);
     }
 
     @Override
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion) {
-        // Nothing yet
+        ReadItLater.onUpgradeDatabase(db, oldVersion);
     }
 
     public static String getName() {

@@ -294,10 +294,30 @@ public class SettingsActivity extends PreferenceActivity
 
     private void onReadLaterItemSelected() {
         if (readLaterCount > 0) {
-            startActivity(new Intent(this, ReadItLaterActivity.class));
+            ReadItLaterActivity.start(SettingsActivity.this);
         } else {
-            Toast.makeText(this, getString(R.string.read_later_empty), Toast.LENGTH_SHORT).show();
+            startReadItLaterIfThereAreArchives();
         }
+    }
+
+    private void startReadItLaterIfThereAreArchives() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(final Void... params) {
+                return ReadItLater.countArchives(SettingsActivity.this);
+            }
+
+            @Override
+            protected void onPostExecute(final Integer count) {
+                if (count > 0) {
+                    ReadItLaterActivity.start(SettingsActivity.this);
+                } else {
+                    Toast.makeText(SettingsActivity.this,
+                            getString(R.string.read_later_empty),
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        }.execute();
     }
 
     private void setupDeleteDatabaseMenuItem(final Menu menu) {

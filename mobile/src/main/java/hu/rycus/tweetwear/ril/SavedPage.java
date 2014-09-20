@@ -17,6 +17,7 @@ public class SavedPage implements Parcelable {
     private final String link;
     private final Tweet tweet;
     private final long timestamp;
+    private final boolean archive;
 
     @Setter
     private boolean read;
@@ -33,6 +34,7 @@ public class SavedPage implements Parcelable {
         dest.writeString(TweetData.of(tweet).toJson());
         dest.writeLong(timestamp);
         dest.writeInt(read ? 1 : 0);
+        dest.writeInt(archive ? 1 : 0);
     }
 
     public static final Creator<SavedPage> CREATOR = new Creator<SavedPage>() {
@@ -43,9 +45,10 @@ public class SavedPage implements Parcelable {
             final String tweetJson = source.readString();
             final long timestamp = source.readLong();
             final int read = source.readInt();
+            final int archive = source.readInt();
 
             final Tweet tweet = TweetData.parse(tweetJson);
-            return new SavedPage(id, link, tweet, timestamp, read > 0);
+            return new SavedPage(id, link, tweet, timestamp, read > 0, archive > 0);
         }
 
         @Override

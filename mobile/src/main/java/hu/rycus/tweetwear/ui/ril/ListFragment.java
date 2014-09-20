@@ -23,10 +23,11 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ListView;
 
 import hu.rycus.tweetwear.R;
-import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.ril.ReadItLater;
 import hu.rycus.tweetwear.ril.SavedPage;
+import hu.rycus.tweetwear.ui.ReadItLaterActivity;
+import hu.rycus.tweetwear.util.AnimationUtil;
 
 public class ListFragment extends android.app.ListFragment {
 
@@ -39,13 +40,19 @@ public class ListFragment extends android.app.ListFragment {
     private static final long ANIMATION_DURATION = 500;
     private static final long ANIMATION_OFFSET = 150;
 
-    private Activity activity;
+    private ReadItLaterActivity activity;
     private ListAdapter listAdapter;
 
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
-        this.activity = activity;
+
+        if (!(activity instanceof ReadItLaterActivity)) {
+            Log.wtf(TAG, String.format("%s expected", ReadItLaterActivity.class.getSimpleName()));
+            return;
+        }
+
+        this.activity = (ReadItLaterActivity) activity;
     }
 
     @Override
@@ -116,9 +123,12 @@ public class ListFragment extends android.app.ListFragment {
         outState.putInt(KEY_STATE_TOP, top);
     }
 
-    public void animateActivityFinishing(final Activity activity) {
-        Log.d(TAG, "Animating activity finish");
+    public void setArchive(final boolean archive) {
+        listAdapter.setArchive(activity, archive);
+        getListView().scrollTo(0, 0);
+    }
 
+    public void animateListClearing() {
         final ListView listView = getListView();
         final int visibleChildCount = listView.getChildCount();
 
@@ -134,7 +144,14 @@ public class ListFragment extends android.app.ListFragment {
         }
 
         if (lastAnimation != null) {
-            lastAnimation.setAnimationListener(createFinishingListener(activity));
+            lastAnimation.setAnimationListener(
+                    AnimationUtil.newOnAnimationEndListener(new Runnable() {
+                        @Override
+                        public void run() {
+                            listAdapter.clear();
+                            onListBecameEmpty();
+                        }
+                    }));
         }
     }
 
@@ -157,21 +174,6 @@ public class ListFragment extends android.app.ListFragment {
         return animationSet;
     }
 
-    private Animation.AnimationListener createFinishingListener(final Activity activity) {
-        return new Animation.AnimationListener() {
-            @Override
-            public void onAnimationEnd(final Animation animation) {
-                Log.d(TAG, "Finishing parent activity");
-                activity.finish();
-            }
-
-            @Override
-            public void onAnimationStart(final Animation animation) { }
-            @Override
-            public void onAnimationRepeat(final Animation animation) { }
-        };
-    }
-
     private SwipeDismissListViewTouchListener createSwipeDismissListener(final ListView listView) {
         return new SwipeDismissListViewTouchListener(listView, createDismissCallback());
     }
@@ -189,26 +191,70 @@ public class ListFragment extends android.app.ListFragment {
                     return;
                 }
 
-                for (final int position : reverseSortedPositions) {
-                    final SavedPage page = (SavedPage) listAdapter.getItem(position);
-                    final long pageId = page.getId();
-                    final Tweet tweet = page.getTweet();
-
-                    listAdapter.deletePage(position);
-
-                    AsyncTask.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            ReadItLater.delete(activity, pageId, tweet);
-                        }
-                    });
-                }
+                deleteDismissedPages(reverseSortedPositions);
 
                 if (listAdapter.getCount() == 0) {
-                    activity.finish();
+                    onListBecameEmpty();
                 }
             }
         };
+    }
+
+    private void deleteDismissedPages(final int[] reverseSortedPositions) {
+        for (final int position : reverseSortedPositions) {
+            final SavedPage page = (SavedPage) listAdapter.getItem(position);
+
+            listAdapter.deletePage(position);
+
+            AsyncTask.execute(new Runnable() {
+                @Override
+                public void run() {
+                    ReadItLater.delete(activity, page);
+                }
+            });
+        }
+    }
+
+    private void onListBecameEmpty() {
+        if (listAdapter.isArchive()) {
+            onAllArchivePagesDeleted();
+        } else {
+            onNonAllArchivePagesDeleted();
+        }
+    }
+
+    private void onAllArchivePagesDeleted() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(final Void... params) {
+                return ReadItLater.count(activity);
+            }
+
+            @Override
+            protected void onPostExecute(final Integer count) {
+                if (count > 0) {
+                    activity.setArchiveItemState(false);
+                } else {
+                    activity.finish();
+                }
+            }
+        }.execute();
+    }
+
+    private void onNonAllArchivePagesDeleted() {
+        new AsyncTask<Void, Void, Integer>() {
+            @Override
+            protected Integer doInBackground(final Void... params) {
+                return ReadItLater.countArchives(activity);
+            }
+
+            @Override
+            protected void onPostExecute(final Integer count) {
+                if (count <= 0) {
+                    activity.finish();
+                }
+            }
+        }.execute();
     }
 
     private final BroadcastReceiver readLaterBroadcastReceiver = new BroadcastReceiver() {
