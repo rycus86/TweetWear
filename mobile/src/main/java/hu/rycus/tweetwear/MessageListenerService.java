@@ -7,7 +7,6 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.model.Tweet;
-import hu.rycus.tweetwear.common.payload.ReadItLaterData;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.preferences.Preferences;
@@ -39,8 +38,8 @@ public class MessageListenerService extends WearableListenerService {
             } else if (Constants.DataPath.MARK_AS_READ.matches(path)) {
                 processMarkAsRead();
             } else if (Constants.DataPath.READ_IT_LATER.matches(path)) {
-                final ReadItLaterData data = ReadItLaterData.parse(messageEvent.getData());
-                processReadItLater(data);
+                final Tweet tweet = TweetData.parse(messageEvent.getData());
+                processReadItLater(tweet);
             } else if (Constants.DataPath.SHOW_IMAGE.matches(path)) {
                 final Tweet tweet = TweetData.parse(messageEvent.getData());
                 processShowImage(tweet, path);
@@ -95,10 +94,10 @@ public class MessageListenerService extends WearableListenerService {
         }
     }
 
-    private void processReadItLater(final ReadItLaterData data) {
-        Log.d(TAG, String.format("Received read later request for url: %s", data.getUrl()));
+    private void processReadItLater(final Tweet tweet) {
+        Log.d(TAG, String.format("Received read later request for tweet #%d", tweet.getId()));
 
-        final ReadItLaterTask task = new ReadItLaterTask(data);
+        final ReadItLaterTask task = new ReadItLaterTask(tweet);
         ApiClientHelper.runAsynchronously(this, task);
     }
 

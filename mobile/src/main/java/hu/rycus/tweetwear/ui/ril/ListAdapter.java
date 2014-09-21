@@ -1,6 +1,8 @@
 package hu.rycus.tweetwear.ui.ril;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -22,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import hu.rycus.tweetwear.R;
+import hu.rycus.tweetwear.common.model.entities.Url;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.ril.ReadItLater;
 import hu.rycus.tweetwear.ril.SavedPage;
@@ -228,23 +231,61 @@ public class ListAdapter extends BaseAdapter {
         });
     }
 
+    private void onPageOpen(final Context context, final SavedPage page) {
+        try {
+            final Url[] urls = page.getTweet().getEntities().getUrls();
+            if (urls.length == 0) {
+                throw new IllegalArgumentException(
+                        String.format("No urls found for tweet #%d", page.getTweet().getId()));
+            } else if (urls.length == 1) {
+                openLink(context, page, urls[0]);
+            } else {
+                final String[] displayUrls = new String[urls.length];
+                for (int index = 0; index < urls.length; index++) {
+                    displayUrls[index] = urls[index].getDisplayUrl();
+                }
+
+                final DialogInterface.OnClickListener openListener =
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(final DialogInterface dialog, final int which) {
+                                openLink(context, page, urls[which]);
+                            }
+                        };
+
+                new AlertDialog.Builder(context)
+                        .setTitle(R.string.open_link)
+                        .setItems(displayUrls, openListener)
+                        .setCancelable(true)
+                        .show();
+            }
+        } catch (Exception ex) {
+            Log.e(TAG, String.format("Failed to open links on saved page for tweet #%d",
+                    page.getTweet().getId()));
+        }
+    }
+
+    private void openLink(final Context context, final SavedPage page, final Url url) {
+        String link = null;
+        try {
+            link = url.getExpandedUrl();
+
+            final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            context.startActivity(intent);
+
+            markAsRead(context, page);
+        } catch (Exception ex) {
+            Log.e(TAG, String.format("Failed to open link: %s", link));
+        }
+    }
+
     private final View.OnClickListener openListener = new View.OnClickListener() {
         @Override
         public void onClick(final View v) {
             final Context context = v.getContext();
 
-            String link = null;
-            try {
-                final SavedPage page = (SavedPage) v.getTag();
-                link = page.getLink();
-
-                final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-                context.startActivity(intent);
-
-                markAsRead(context, page);
-            } catch (Exception ex) {
-                Log.e(TAG, String.format("Failed to open link: %s", link), ex);
-            }
+            final SavedPage page = (SavedPage) v.getTag();
+            onPageOpen(context, page);
         }
     };
 

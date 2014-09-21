@@ -102,11 +102,8 @@ public class TweetNotification {
         final Entities entities = tweet.getEntities();
         if (entities != null) {
             final Url[] urls = entities.getUrls();
-            if (urls != null) {
-                for (final Url url : urls) {
-                    final ReadItLaterAction action = new ReadItLaterAction(url);
-                    extender.addAction(action.build(context, tweet));
-                }
+            if (urls != null && urls.length > 0) {
+                extender.addAction(new ReadItLaterAction().build(context, tweet));
             }
         }
     }

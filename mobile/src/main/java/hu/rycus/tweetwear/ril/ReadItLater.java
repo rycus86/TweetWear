@@ -26,7 +26,6 @@ public class ReadItLater {
     private static final String TABLE_NAME_ARCHIVE = "read_it_later_archive";
 
     private static final String COLUMN_ID = BaseColumns._ID;
-    private static final String COLUMN_LINK = "link";
     private static final String COLUMN_TWEET_JSON = "tweet";
     private static final String COLUMN_READ = "read";
     private static final String COLUMN_TIMESTAMP = "timestamp";
@@ -34,7 +33,6 @@ public class ReadItLater {
     private static final String CREATE_TABLE_SQL_MAIN =
             "CREATE TABLE " + TABLE_NAME_MAIN + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_LINK + " TEXT, " +
                     COLUMN_TWEET_JSON + " TEXT, " +
                     COLUMN_READ + " INTEGER, " +
                     COLUMN_TIMESTAMP + " INTEGER)";
@@ -42,7 +40,6 @@ public class ReadItLater {
     private static final String CREATE_TABLE_SQL_ARCHIVE =
             "CREATE TABLE " + TABLE_NAME_ARCHIVE + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_LINK + " TEXT, " +
                     COLUMN_TWEET_JSON + " TEXT, " +
                     COLUMN_TIMESTAMP + " INTEGER)";
 
@@ -56,6 +53,9 @@ public class ReadItLater {
 
     public static void onUpgradeDatabase(final SQLiteDatabase database, final int oldVersion) {
         if (oldVersion < 2) {
+            // drop link column
+            database.execSQL("ALTER TABLE " + TABLE_NAME_MAIN + " DROP COLUMN link");
+            // create archive table
             database.execSQL(CREATE_TABLE_SQL_ARCHIVE);
         }
     }
@@ -75,7 +75,6 @@ public class ReadItLater {
             final String tableName = archive ? TABLE_NAME_ARCHIVE : TABLE_NAME_MAIN;
             final String[] columns = {
                     COLUMN_ID,
-                    COLUMN_LINK,
                     COLUMN_TWEET_JSON,
                     archive ? Integer.toString(BOOL_TRUE) : COLUMN_READ,
                     COLUMN_TIMESTAMP };
@@ -96,13 +95,12 @@ public class ReadItLater {
 
                     do {
                         final long id = cursor.getLong(0);
-                        final String link = cursor.getString(1);
-                        final String tweetJson = cursor.getString(2);
-                        final boolean read = cursor.getInt(3) == BOOL_TRUE;
-                        final long timestamp = cursor.getLong(4);
+                        final String tweetJson = cursor.getString(1);
+                        final boolean read = cursor.getInt(2) == BOOL_TRUE;
+                        final long timestamp = cursor.getLong(3);
 
                         final Tweet tweet = TweetData.parse(tweetJson);
-                        items.add(new SavedPage(id, link, tweet, timestamp, read, archive));
+                        items.add(new SavedPage(id, tweet, timestamp, archive, read));
                     } while (cursor.moveToNext());
 
                     return items;
@@ -134,11 +132,10 @@ public class ReadItLater {
         }
     }
 
-    public static long insert(final Context context, final String link, final Tweet tweet) {
+    public static long insert(final Context context, final Tweet tweet) {
         final SQLiteDatabase db = helper(context).getWritableDatabase();
         try {
-            final ContentValues values = new ContentValues(4);
-            values.put(COLUMN_LINK, link);
+            final ContentValues values = new ContentValues(3);
             values.put(COLUMN_TWEET_JSON, TweetData.of(tweet).toJson());
             values.put(COLUMN_READ, BOOL_FALSE);
             values.put(COLUMN_TIMESTAMP, System.currentTimeMillis());
@@ -163,8 +160,7 @@ public class ReadItLater {
     public static long archive(final Context context, final SavedPage page) {
         final SQLiteDatabase db = helper(context).getWritableDatabase();
         try {
-            final ContentValues values = new ContentValues(3);
-            values.put(COLUMN_LINK, page.getLink());
+            final ContentValues values = new ContentValues(2);
             values.put(COLUMN_TWEET_JSON, TweetData.of(page.getTweet()).toJson());
             values.put(COLUMN_TIMESTAMP, page.getTimestamp());
 

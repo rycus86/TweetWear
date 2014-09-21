@@ -13,12 +13,6 @@ import hu.rycus.tweetwear.common.util.TweetData;
 
 public class ReadItLaterAction extends BaseTweetAction {
 
-    private final Url url;
-
-    public ReadItLaterAction(final Url url) {
-        this.url = url;
-    }
-
     @Override
     protected int getIcon(final Context context, final Tweet tweet) {
         return R.drawable.ic_web_site;
@@ -26,20 +20,20 @@ public class ReadItLaterAction extends BaseTweetAction {
 
     @Override
     protected CharSequence getTitle(final Context context, final Tweet tweet) {
-        final int actionResource;
+        final String action;
         if (tweet.isSavedToReadLater()) {
-            actionResource = R.string.read_later_saved;
+            action = context.getString(R.string.read_later_saved);
         } else {
-            actionResource = R.string.read_later;
+            action = context.getString(R.string.read_later);
         }
-        return getTitle(context, actionResource, url.getDisplayUrl());
-    }
 
-    private CharSequence getTitle(final Context context,
-                                  final int actionResource, final String link) {
-        final String action = context.getString(actionResource);
-        return Html.fromHtml(String.format(
-                "%s<br/><small>%s</small>", action, link));
+        final Url[] urls = tweet.getEntities().getUrls();
+        if (urls.length == 1) {
+            final String link = urls[0].getDisplayUrl();
+            return Html.fromHtml(String.format("%s<br/><small>%s</small>", action, link));
+        } else {
+            return getTitleWithActionAndTweetInformation(context, tweet, action);
+        }
     }
 
     @Override
@@ -58,6 +52,5 @@ public class ReadItLaterAction extends BaseTweetAction {
             final Context context, final Tweet tweet, final Intent startIntent) {
         super.putExtrasIntoIntent(context, tweet, startIntent);
         startIntent.putExtra(Constants.EXTRA_TWEET_JSON, TweetData.of(tweet).toJson());
-        startIntent.putExtra(Constants.EXTRA_READ_IT_LATER_URL, url.getExpandedUrl());
     }
 }

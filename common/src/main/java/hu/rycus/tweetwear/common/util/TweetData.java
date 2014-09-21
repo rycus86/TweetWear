@@ -227,23 +227,46 @@ public final class TweetData {
         tweet.setUser(user);
         tweet.setCreatedAt(new Date());
         tweet.setId(id);
-        tweet.setText("Test demo tweet t.co/abcd");
-        final Media media = new Media();
-        media.setId(12345);
-        media.setUrl("t.co/abcd");
-        media.setDisplayUrl("t.co/image");
-        media.setMediaUrl("http://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
-        media.setMediaUrlHttps("https://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
+
+        final Media media1 = new Media();
+        media1.setId(12345);
+        media1.setUrl("t.co/abcd");
+        media1.setDisplayUrl("t.co/image");
+        media1.setMediaUrl("http://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
+        media1.setMediaUrlHttps("https://pbs.twimg.com/media/Bxn2oniCQAAswZr.jpg");
+        final Media media2 = new Media();
+        media2.setId(12350);
+        media2.setUrl("t.co/efgh");
+        media2.setDisplayUrl("t.co/image-2nd");
+        media2.setMediaUrl("http://pbs.twimg.com/media/ByA3SlCCYAEv7iS.png");
+        media2.setMediaUrlHttps("https://pbs.twimg.com/media/ByA3SlCCYAEv7iS.png");
         final Size size = new Size();
         size.setWidth(280);
         size.setHeight(280);
         size.setResize(Size.Resize.FIT);
         final Sizes sizes = new Sizes();
         sizes.setSmall(size);
-        media.setSizes(sizes);
+        media1.setSizes(sizes);
+        media2.setSizes(sizes);
+
+        final Url url1 = new Url();
+        url1.setUrl("goog.le");
+        url1.setDisplayUrl("google.com");
+        url1.setExpandedUrl("http://google.com");
+        final Url url2 = new Url();
+        url2.setUrl("twitt.er");
+        url2.setDisplayUrl("twitter.com");
+        url2.setExpandedUrl("http://twitter.com");
+
         final Entities entities = new Entities();
-        entities.setMedia(new Media[] { media });
+        entities.setMedia(new Media[]{media1, media2});
+        entities.setUrls(new Url[] {url1, url2});
         tweet.setEntities(entities);
+
+        tweet.setText(String.format("Test demo tweet %s %s %s %s",
+                        url1.getUrl(), url2.getUrl(),
+                        media1.getUrl(), media2.getUrl()));
+
         return tweet;
     }
 

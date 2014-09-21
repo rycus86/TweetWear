@@ -14,7 +14,6 @@ import lombok.Setter;
 public class SavedPage implements Parcelable {
 
     private final long id;
-    private final String link;
     private final Tweet tweet;
     private final long timestamp;
     private final boolean archive;
@@ -30,7 +29,6 @@ public class SavedPage implements Parcelable {
     @Override
     public void writeToParcel(final Parcel dest, final int flags) {
         dest.writeLong(id);
-        dest.writeString(link);
         dest.writeString(TweetData.of(tweet).toJson());
         dest.writeLong(timestamp);
         dest.writeInt(read ? 1 : 0);
@@ -41,14 +39,13 @@ public class SavedPage implements Parcelable {
         @Override
         public SavedPage createFromParcel(final Parcel source) {
             final long id = source.readLong();
-            final String link = source.readString();
             final String tweetJson = source.readString();
             final long timestamp = source.readLong();
             final int read = source.readInt();
             final int archive = source.readInt();
 
             final Tweet tweet = TweetData.parse(tweetJson);
-            return new SavedPage(id, link, tweet, timestamp, read > 0, archive > 0);
+            return new SavedPage(id, tweet, timestamp, archive > 0, read > 0);
         }
 
         @Override

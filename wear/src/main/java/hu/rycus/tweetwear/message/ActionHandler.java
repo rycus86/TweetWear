@@ -30,7 +30,7 @@ public class ActionHandler {
             sendMarkAsRead(context);
         } else if (Constants.ACTION_READ_IT_LATER.equals(intent.getAction())) {
             sendReadItLater(context, intent);
-        } else if (Constants.ACTION_SHOW_IMAGE.equals(intent.getAction())) {
+        } else if (Constants.Action.SHOW_IMAGE.matches(intent.getAction())) {
             sendShowImage(context, intent);
         }
     }
@@ -59,10 +59,9 @@ public class ActionHandler {
     private static void sendReadItLater(final Context context, final Intent intent) {
         final String tweetJson = intent.getStringExtra(Constants.EXTRA_TWEET_JSON);
         final Tweet tweet = TweetData.parse(tweetJson);
-        final String url = intent.getStringExtra(Constants.EXTRA_READ_IT_LATER_URL);
-        if (tweet != null && url != null) {
-            Log.d(TAG, String.format("Requesting read later for url: %s", url));
-            ApiClientHelper.runAsynchronously(context, new ReadItLaterTask(tweet, url));
+        if (tweet != null) {
+            Log.d(TAG, String.format("Requesting read later for tweet #%d", tweet.getId()));
+            ApiClientHelper.runAsynchronously(context, new ReadItLaterTask(tweet));
         }
     }
 

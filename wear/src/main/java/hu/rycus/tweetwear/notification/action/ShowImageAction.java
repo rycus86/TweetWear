@@ -33,7 +33,8 @@ public class ShowImageAction extends BaseTweetAction {
 
     @Override
     protected PendingIntent getPendingIntent(final Context context, final Tweet tweet) {
-        return getPendingIntentForService(context, tweet, Constants.ACTION_SHOW_IMAGE);
+        final String action = Constants.Action.SHOW_IMAGE.withId(media.getId());
+        return getPendingIntentForService(context, tweet, action);
     }
 
     @Override

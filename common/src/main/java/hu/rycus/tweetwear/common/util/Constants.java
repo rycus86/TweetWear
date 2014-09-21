@@ -15,7 +15,6 @@ public interface Constants {
     String ACTION_CAPTURE_REPLY = PACKAGE_NAME + ".CaptureReply";
     String ACTION_MARK_AS_READ = PACKAGE_NAME + ".MarkAsRead";
     String ACTION_READ_IT_LATER = PACKAGE_NAME + ".ReadItLater";
-    String ACTION_SHOW_IMAGE = PACKAGE_NAME + ".ShowImage";
     String ACTION_DO_NOTHING = PACKAGE_NAME + ".DoNothing";
 
     String ACTION_BROADCAST_READ_IT_LATER = PACKAGE_NAME + ".Broadcast.ReadItLater";
@@ -23,12 +22,30 @@ public interface Constants {
     String EXTRA_TWEET_ID = "__tweet_id";
     String EXTRA_TWEET_JSON = "__tweet_json";
     String EXTRA_REPLY_TO_NAME = "__reply_to_name";
-    String EXTRA_READ_IT_LATER_URL = "__read_later_url";
     String EXTRA_SHOW_MEDIA_ID = "__show_media_id";
 
     String QUERY_PARAM_OAUTH_VERIFIER = "oauth_verifier";
 
     int COLOR_TWITTER_BACKGROUND = Color.parseColor("#55ACEE");
+
+    public enum Action {
+
+        SHOW_IMAGE;
+
+        public String get() {
+            return name();
+        }
+
+        public String withId(final Object id) {
+            return String.format("%s.%s/%s", PACKAGE_NAME, name(), id);
+        }
+
+        public boolean matches(final String action) {
+            final String pattern = String.format("%s\\.%s(/.+)?", PACKAGE_NAME, name());
+            return action.matches(pattern);
+        }
+
+    }
 
     public enum DataPath {
 
