@@ -2,7 +2,27 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <item name="android:actionBarStyle">@style/BlueActionBar</item>
+        <item name="android:actionBarTabBarStyle">@style/BlueActionBar.TabStyle</item>
+        <item name="android:actionBarWidgetTheme">@style/BlueActionBar.Widget</item>
+    </style>
+
+    <style name="BlueActionBar" parent="android:Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/App.Blue</item>
+    </style>
+
+    <style name="BlueActionBar.Widget" parent="android:Theme.Holo.Light">
+        <item name="android:popupMenuStyle">@android:style/Widget.Holo.Light.PopupMenu</item>
+        <item name="android:dropDownListViewStyle">@style/BlueActionBar.Widget.DropDown</item>
+        <item name="android:textColor">@color/App.Blue.LightText</item>
+    </style>
+
+    <style name="BlueActionBar.Widget.DropDown" parent="android:Widget.Holo.Light.ListView.DropDown">
+        <item name="android:background">@drawable/action_bar_gradient</item>
+    </style>
+
+    <style name="BlueActionBar.TabStyle" parent="android:Widget.ActionBar.TabBar">
+        <item name="android:background">@drawable/action_bar_gradient</item>
     </style>
 
     <style name="ItemTitle" parent="android:TextAppearance.DeviceDefault.Medium">
@@ -15,5 +35,9 @@
     <style name="FlatButton" parent="AppTheme">
         <item name="android:background">#9090FF</item>
     </style>
+
+    <color name="App.Blue">#335677</color>
+    <color name="App.Blue.Darker">#224566</color>
+    <color name="App.Blue.LightText">#E3E3E3</color>
 
 </resources>
