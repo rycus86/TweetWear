@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 
@@ -21,6 +22,8 @@ import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.database.TweetWearDatabase;
 
 public class ReadItLater {
+
+    private static final String TAG = ReadItLater.class.getSimpleName();
 
     private static final String TABLE_NAME_MAIN = "read_it_later";
     private static final String TABLE_NAME_ARCHIVE = "read_it_later_archive";
@@ -53,8 +56,35 @@ public class ReadItLater {
 
     public static void onUpgradeDatabase(final SQLiteDatabase database, final int oldVersion) {
         if (oldVersion < 2) {
+            boolean successfullyUpgraded = false;
+
             // drop link column
-            database.execSQL("ALTER TABLE " + TABLE_NAME_MAIN + " DROP COLUMN link");
+            database.beginTransaction();
+            try {
+                database.execSQL("CREATE TEMPORARY TABLE ril_tmp (tj, r, ts)");
+                database.execSQL("INSERT INTO ril_tmp " +
+                        "SELECT tweet, read, timestamp FROM " + TABLE_NAME_MAIN);
+                database.execSQL("DROP TABLE " + TABLE_NAME_MAIN);
+                database.execSQL(CREATE_TABLE_SQL_MAIN);
+                database.execSQL("INSERT INTO " + TABLE_NAME_MAIN + " (tweet, read, timestamp) " +
+                        "SELECT tj, r, ts FROM ril_tmp");
+                database.execSQL("DROP TABLE ril_tmp");
+
+                database.setTransactionSuccessful();
+
+                successfullyUpgraded = true;
+            } catch (Exception ex) {
+                Log.e(TAG, "Failed to upgrade the database", ex);
+            } finally {
+                database.endTransaction();
+            }
+
+            if (!successfullyUpgraded) {
+                Log.w(TAG, "Recreating ReadItLater table");
+                database.execSQL("DROP TABLE " + TABLE_NAME_MAIN);
+                database.execSQL(CREATE_TABLE_SQL_MAIN);
+            }
+
             // create archive table
             database.execSQL(CREATE_TABLE_SQL_ARCHIVE);
         }
