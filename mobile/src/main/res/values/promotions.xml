@@ -7,4 +7,11 @@
         and read them on your phone later.
     </string>
 
+    <string name="promo_images_and_archive" translatable="false">
+        <b>Images</b>:
+        Show embedded images in Tweets.
+        <b>Read It Later</b>:
+        You can now also archive your saved pages.
+    </string>
+
 </resources>
