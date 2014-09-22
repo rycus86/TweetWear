@@ -69,6 +69,10 @@
 
     <string name="read_later">Olvasás később</string>
     <string name="read_later_empty">Nincs mentett oldal</string>
+    <string name="open_link">Megnyitás</string>
+    <string name="archive_page">Archív</string>
+    <string name="show_archives">Archív oldalak</string>
+    <string name="no_archives">Nincs archív oldal</string>
     <string name="menu_delete_all">Összes törlése</string>
 
     <string name="promo_title">Újdonság</string>

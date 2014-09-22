@@ -38,4 +38,7 @@
 
     <string name="promo_title">Újdonság</string>
 
+    <string name="show_image">Kép megjelenítése</string>
+    <string name="show_image_failure">Nem sikerült a letöltés</string>
+
 </resources>

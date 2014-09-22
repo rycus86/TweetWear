@@ -38,4 +38,7 @@
 
     <string name="promo_title">Que hay de nuevo?</string>
 
+    <string name="show_image">Mostrar imágen</string>
+    <string name="show_image_failure">Falló mostrar imágen</string>
+
 </resources>

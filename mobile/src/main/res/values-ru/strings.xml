@@ -73,4 +73,10 @@
 
     <string name="promo_title">Что нового?</string>
 
+    <!-- To translate -->
+    <string name="open_link">Open link</string>
+    <string name="archive_page">Archive</string>
+    <string name="show_archives">Archived pages</string>
+    <string name="no_archives">No archived pages</string>
+
 </resources>
