@@ -69,14 +69,12 @@
 
     <string name="read_later">Прочитать позже</string>
     <string name="read_later_empty">Нет сохраненного для дальнейшего прочтения</string>
+    <string name="open_link">Открыть ссылку</string>
+    <string name="archive_page">Сохранить в архив</string>
+    <string name="show_archives">Страницы в архиве</string>
+    <string name="no_archives">Нет страниц в архиве</string>
     <string name="menu_delete_all">Удалить все</string>
 
     <string name="promo_title">Что нового?</string>
-
-    <!-- To translate -->
-    <string name="open_link">Open link</string>
-    <string name="archive_page">Archive</string>
-    <string name="show_archives">Archived pages</string>
-    <string name="no_archives">No archived pages</string>
 
 </resources>

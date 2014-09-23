@@ -38,8 +38,7 @@
 
     <string name="promo_title">Что нового?</string>
 
-    <!-- To translate -->
-    <string name="show_image">Show image</string>
-    <string name="show_image_failure">Failed to download image</string>
+    <string name="show_image">Показать изображение</string>
+    <string name="show_image_failure">Ошибка загрузки изображения</string>
 
 </resources>
