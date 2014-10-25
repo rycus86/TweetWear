@@ -169,7 +169,9 @@ public class FetchTweetsTask extends ApiClientRunnable {
 
     protected void checkMarkedTweetId(final Context context) {
         final long lastReadTweetId = Preferences.getLastReadTweetId(context);
-        checkSinceId(lastReadTweetId);
+        if (lastReadTweetId > -1L) {
+            checkSinceId(lastReadTweetId);
+        }
     }
 
     protected void setExistingTweets(final Collection<Tweet> tweets) {
