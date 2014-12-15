@@ -9,8 +9,8 @@ android {
         applicationId "hu.rycus.tweetwear"
         minSdkVersion 20
         targetSdkVersion 20
-        versionCode 13
-        versionName "0.4.3"
+        versionCode 14
+        versionName "0.4.4"
     }
     buildTypes {
         release {
