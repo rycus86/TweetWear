@@ -30,7 +30,7 @@ public class PostTweetActivity extends Activity
     private static final String TAG = PostTweetActivity.class.getSimpleName();
 
     private static final String ACTION_TASK_FINISHED =
-            BuildConfig.PACKAGE_NAME + ".PostTaskFinished";
+            BuildConfig.APPLICATION_ID + ".PostTaskFinished";
 
     private static final int REQUEST_NEW_TWEET = 100;
     private static final int REQUEST_REPLY = 101;
