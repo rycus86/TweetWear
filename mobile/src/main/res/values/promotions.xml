@@ -14,4 +14,8 @@
         You can now also archive your saved pages.
     </string>
 
+    <string name="bugfixes" translatable="false">
+        Bugfixes
+    </string>
+
 </resources>

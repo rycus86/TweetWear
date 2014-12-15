@@ -15,7 +15,7 @@ public class Promotions {
     private static final String PREFERENCES_NAME = "promotions";
 
     private static final Promotion ACTIVE_PROMO =
-            new Promotion("images_and_archive", R.string.promo_images_and_archive);
+            new Promotion("bugfixes_044", R.string.bugfixes);
 
     private static AlertDialog activeDialog = null;
 
