@@ -25,6 +25,10 @@ public class TweetNotification {
 
     private TweetNotification() {}
 
+    public static void clear(final Context context) {
+        NotificationManagerCompat.from(context).cancelAll();
+    }
+
     public static void send(final Context context, final Tweet tweet) {
         Log.d(TAG, String.format("Notifying for tweet: %s - %s",
                 tweet.getUser().getScreenName(), tweet.getText()));
