@@ -24,7 +24,7 @@ public class ClearExistingTweetsTask extends ApiClientRunnable {
 
     @Override
     protected void run(final Context context, final GoogleApiClient apiClient) throws Exception {
-        long lastTweetId = 0L;
+        long lastTweetId = -1L;
 
         final Collection<Tweet> tweets = TweetData.loadAll(apiClient);
         for (final Tweet tweet : tweets) {
@@ -37,7 +37,7 @@ public class ClearExistingTweetsTask extends ApiClientRunnable {
 
         Log.d(TAG, String.format("Cleared %d tweets", tweets.size()));
 
-        if (markLastTweetId) {
+        if (markLastTweetId && lastTweetId > -1L) {
             if (Preferences.saveLastReadTweetId(context, lastTweetId)) {
                 Log.d(TAG, String.format("Marked last tweet ID as #%d", lastTweetId));
             } else {

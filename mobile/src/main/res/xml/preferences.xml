@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory android:title="TODO remove" android:order="1">
+        <Preference android:key="test_stream_start" android:persistent="false"
+                    android:title="Start streaming"/>
+        <Preference android:key="test_stream_stop" android:persistent="false"
+                    android:title="Stop streaming"/>
+        <Preference android:key="test_stream_abort" android:persistent="false"
+                    android:title="Abort streaming"/>
+    </PreferenceCategory>
+
     <PreferenceCategory
         android:title="@string/pref_header_account"
         android:order="10">

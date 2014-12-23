@@ -8,13 +8,19 @@ import hu.rycus.tweetwear.common.model.User;
 import hu.rycus.tweetwear.preferences.Preferences;
 import hu.rycus.tweetwear.twitter.account.AccountProvider;
 import hu.rycus.tweetwear.twitter.account.IAccountProvider;
+import hu.rycus.tweetwear.twitter.client.IStreamingClient;
 import hu.rycus.tweetwear.twitter.client.ITwitterClient;
+import hu.rycus.tweetwear.twitter.client.StreamingClient;
 import hu.rycus.tweetwear.twitter.client.TwitterClient;
 
 public class TwitterFactory {
 
-    public static ITwitterClient createClient() {
-        return new TwitterClient();
+    public static ITwitterClient restClient() {
+        return TwitterClient.INSTANCE;
+    }
+
+    public static IStreamingClient streamingClient() {
+        return StreamingClient.INSTANCE;
     }
 
     public static IAccountProvider createProvider() {

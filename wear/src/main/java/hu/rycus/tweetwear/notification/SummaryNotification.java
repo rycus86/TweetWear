@@ -26,6 +26,12 @@ public class SummaryNotification {
                 notification);
     }
 
+    public static void delete(final Context context) {
+        NotificationManagerCompat.from(context).cancel(
+                NotificationConstants.Tag.SUMMARY.get(),
+                NotificationConstants.Id.SUMMARY.get());
+    }
+
     private static Notification build(final Context context, final int count,
                                       final NotificationSettings settings) {
         final String title = context.getResources()

@@ -36,6 +36,8 @@ public class TweetNotificationTask extends ApiClientRunnable {
 
         Log.d(TAG, String.format("%d tweets found", tweets.size()));
 
+        TweetNotification.clearAll(context);
+
         for (final Tweet tweet : tweets) {
             TweetNotification.send(context, tweet);
         }

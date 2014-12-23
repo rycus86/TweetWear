@@ -3,6 +3,7 @@ package hu.rycus.tweetwear.message;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 import com.google.android.gms.wearable.MessageEvent;
@@ -14,9 +15,11 @@ import hu.rycus.tweetwear.ShowImageActivity;
 import hu.rycus.tweetwear.common.api.ApiClientHelper;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.payload.NotificationSettings;
+import hu.rycus.tweetwear.common.payload.TweetWithNotificationSettings;
 import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.PromotionNotification;
+import hu.rycus.tweetwear.notification.SummaryNotification;
 import hu.rycus.tweetwear.notification.TweetNotification;
 import hu.rycus.tweetwear.task.TweetNotificationTask;
 
@@ -33,6 +36,12 @@ public class MessageHandler {
                 final NotificationSettings settings =
                         NotificationSettings.parse(messageEvent.getData());
                 onSyncComplete(context, settings);
+            } else if (Constants.DataPath.TWEET_RECEIVED.matches(path)) {
+                final TweetWithNotificationSettings tweetWithSettings =
+                        TweetWithNotificationSettings.parse(messageEvent.getData());
+                onTweetReceived(context, tweetWithSettings);
+            } else if (Constants.DataPath.TWEET_DELETE.matches(path)) {
+                onTweetDeleted(context, path);
             } else if (Constants.DataPath.PROMOTION.matches(path)) {
                 final String promotionId = Constants.DataPath.PROMOTION.replace(path, "$1");
                 final String promotionText = new String(messageEvent.getData());
@@ -83,6 +92,28 @@ public class MessageHandler {
     private static void onSyncComplete(final Context context, final NotificationSettings settings) {
         Log.d(TAG, "Starting Tweet notification task");
         ApiClientHelper.runAsynchronously(context, new TweetNotificationTask(settings));
+    }
+
+    private static void onTweetReceived(final Context context,
+                                        final TweetWithNotificationSettings tweetWithSettings) {
+        final Tweet tweet = tweetWithSettings.getTweet();
+        final NotificationSettings settings = tweetWithSettings.getSettings();
+
+        Log.d(TAG, String.format("Notifying for tweet: @%s - %s",
+                tweet.getUser().getScreenName(), tweet.getText()));
+
+        TweetNotification.send(context, tweetWithSettings.getTweet());
+        SummaryNotification.send(context, /* TODO get proper count */ 1, settings);
+    }
+
+    private static void onTweetDeleted(final Context context, final String eventPath) {
+        final String stringTweetId = Constants.DataPath.TWEET_DELETE.replace(eventPath, "$1");
+        final long tweetId = Long.parseLong(stringTweetId);
+
+        Log.d(TAG, String.format("Deleting tweet #%d", tweetId));
+        // TweetNotification.delete(context, tweetId);
+        // SummaryNotification.delete(context);
+        NotificationManagerCompat.from(context).cancelAll();
     }
 
     private static void onPromotionReceived(final Context context,

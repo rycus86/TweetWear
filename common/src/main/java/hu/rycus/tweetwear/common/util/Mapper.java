@@ -3,6 +3,7 @@ package hu.rycus.tweetwear.common.util;
 import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,6 +64,10 @@ public class Mapper {
         }
 
         return null;
+    }
+
+    public static ObjectReader reader() {
+        return OBJECT_MAPPER.reader();
     }
 
 }

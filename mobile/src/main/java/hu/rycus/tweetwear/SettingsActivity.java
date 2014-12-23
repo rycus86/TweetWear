@@ -126,6 +126,7 @@ public class SettingsActivity extends PreferenceActivity
         accountItem = SettingsHelper.findAccountInfo(this);
         setupAccountItem();
 
+        SettingsHelper.TODO$remove$setupTests(this);
         SettingsHelper.setupLists(this);
         SettingsHelper.setupSyncInterval(this);
         SettingsHelper.setupSyncNow(this);
@@ -154,13 +155,13 @@ public class SettingsActivity extends PreferenceActivity
             accountItem.setTitle(formatUsername(existingUsername));
         } else {
             accountItem.setTitle(R.string.loading_account);
-            TwitterFactory.createClient().loadUsername(this, this);
+            TwitterFactory.restClient().loadUsername(this, this);
         }
     }
 
     private void setupAccessLevelNotice() {
         if (!Preferences.hasDesiredAccessLevel(this)) {
-            TwitterFactory.createClient().checkAccessLevel(this, this);
+            TwitterFactory.restClient().checkAccessLevel(this, this);
         }
     }
 
@@ -170,7 +171,7 @@ public class SettingsActivity extends PreferenceActivity
         accountItem.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
-                TwitterFactory.createClient().authorize(preference.getContext());
+                TwitterFactory.restClient().authorize(preference.getContext());
                 return true;
             }
         });
@@ -182,7 +183,7 @@ public class SettingsActivity extends PreferenceActivity
         accountItem.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(final Preference preference) {
-                TwitterFactory.createClient().authorize(preference.getContext());
+                TwitterFactory.restClient().authorize(preference.getContext());
                 return true;
             }
         });
@@ -220,7 +221,7 @@ public class SettingsActivity extends PreferenceActivity
 
     private void handleOauthVerification(final String verifier) {
         Log.d(TAG, "Handling OAuth verification");
-        TwitterFactory.createClient().processAccessToken(this, verifier, this);
+        TwitterFactory.restClient().processAccessToken(this, verifier, this);
     }
 
     @Override
@@ -231,8 +232,8 @@ public class SettingsActivity extends PreferenceActivity
 
         accountItem.setTitle(getString(R.string.loading_account));
 
-        TwitterFactory.createClient().loadUsername(this, this);
-        TwitterFactory.createClient().checkAccessLevel(this, this);
+        TwitterFactory.restClient().loadUsername(this, this);
+        TwitterFactory.restClient().checkAccessLevel(this, this);
 
         SyncService.scheduleSync(this);
     }

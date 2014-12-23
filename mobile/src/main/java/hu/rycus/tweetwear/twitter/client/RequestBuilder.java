@@ -1,5 +1,7 @@
 package hu.rycus.tweetwear.twitter.client;
 
+import android.util.Log;
+
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -7,6 +9,8 @@ import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.TimeUnit;
 
 import hu.rycus.tweetwear.common.util.Mapper;
 import hu.rycus.tweetwear.common.util.Value;
@@ -37,9 +41,29 @@ public class RequestBuilder {
         return this;
     }
 
+    public RequestBuilder setConnectTimeout(final int duration, final TimeUnit unit) {
+        request.setConnectTimeout(duration, unit);
+        return this;
+    }
+
+    public RequestBuilder setReadTimeout(final int duration, final TimeUnit unit) {
+        request.setReadTimeout(duration, unit);
+        return this;
+    }
+
+    public RequestBuilder setKeepAlive(final boolean keepAlive) {
+        request.setConnectionKeepAlive(keepAlive);
+        return this;
+    }
+
     public ResponseBuilder send(final OAuthService service, final Token accessToken) {
         service.signRequest(accessToken, request);
         return new ResponseBuilder(request.send());
+    }
+
+    public InputStream stream(final OAuthService service, final Token accessToken) {
+        service.signRequest(accessToken, request);
+        return new ResponseBuilder(request.send()).stream();
     }
 
     public static RequestBuilder get(final String baseUri) {
@@ -82,13 +106,16 @@ public class RequestBuilder {
             return Mapper.readObject(response.getStream(), responseClass);
         }
 
+        public InputStream stream() {
+            return response.getStream();
+        }
+
     }
 
     private static void checkHttpStatus(final Response response) {
         if (response.getCode() != 200) {
-            throw new IllegalArgumentException(
-                    String.format("HTTP Request was unsuccessful: %d - %s",
-                            response.getCode(), response.getMessage()));
+            Log.e("HTTP", "Error headers: " + response.getHeaders());
+            throw new HttpResponseException(response.getCode(), response.getMessage());
         }
     }
 

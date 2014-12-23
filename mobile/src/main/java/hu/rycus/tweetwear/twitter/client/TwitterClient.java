@@ -3,12 +3,9 @@ package hu.rycus.tweetwear.twitter.client;
 import android.content.Context;
 import android.util.Log;
 
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.TwitterApi;
 import org.scribe.model.Token;
 import org.scribe.oauth.OAuthService;
 
-import hu.rycus.tweetwear.BuildConfig;
 import hu.rycus.tweetwear.common.model.Lists;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.User;
@@ -22,11 +19,13 @@ import hu.rycus.tweetwear.twitter.client.callbacks.AccessLevelCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.AccessTokenCallback;
 import hu.rycus.tweetwear.twitter.client.callbacks.UsernameCallback;
 
-public class TwitterClient implements ITwitterClient {
+public enum TwitterClient implements ITwitterClient {
+
+    INSTANCE;
 
     private static final String TAG = "TwitterClient";
 
-    private static final OAuthService service = createOAuthService();
+    private static final OAuthService service = OAuthServiceProvider.INSTANCE.get();
 
     @Override
     public void authorize(final Context context) {
@@ -240,15 +239,6 @@ public class TwitterClient implements ITwitterClient {
         }
 
         return new Tweet[0];
-    }
-
-    private static OAuthService createOAuthService() {
-        return new ServiceBuilder()
-                .provider(TwitterApi.SSL.class)
-                .apiKey(BuildConfig.API_KEY)
-                .apiSecret(BuildConfig.API_SECRET)
-                .callback(Uri.CALLBACK.get())
-                .build();
     }
 
 }

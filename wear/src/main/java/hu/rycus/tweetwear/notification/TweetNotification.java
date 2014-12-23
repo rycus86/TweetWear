@@ -1,23 +1,27 @@
 package hu.rycus.tweetwear.notification;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
 import hu.rycus.tweetwear.R;
+import hu.rycus.tweetwear.TweetWearService;
 import hu.rycus.tweetwear.common.model.Tweet;
 import hu.rycus.tweetwear.common.model.entities.Entities;
 import hu.rycus.tweetwear.common.model.entities.Media;
 import hu.rycus.tweetwear.common.model.entities.Url;
+import hu.rycus.tweetwear.common.util.Constants;
 import hu.rycus.tweetwear.common.util.TweetData;
 import hu.rycus.tweetwear.notification.action.FavoriteAction;
-import hu.rycus.tweetwear.notification.action.ShowImageAction;
 import hu.rycus.tweetwear.notification.action.ReadItLaterAction;
 import hu.rycus.tweetwear.notification.action.ReplyAction;
 import hu.rycus.tweetwear.notification.action.RetweetAction;
+import hu.rycus.tweetwear.notification.action.ShowImageAction;
 
 public class TweetNotification {
 
@@ -36,6 +40,16 @@ public class TweetNotification {
                 notification);
     }
 
+    public static void delete(final Context context, final long tweetId) {
+        NotificationManagerCompat.from(context).cancel(
+                NotificationConstants.Tag.TWEET.withId(tweetId),
+                NotificationConstants.Id.TWEET.get());
+    }
+
+    public static void clearAll(final Context context) {
+        NotificationManagerCompat.from(context).cancelAll();
+    }
+
     private static Notification build(final Context context, final Tweet tweet) {
         final TweetData tweetData = TweetData.of(tweet);
 
@@ -49,7 +63,17 @@ public class TweetNotification {
                 .setStyle(new Notification.BigTextStyle().bigText(contentHtml))
                 .setGroup(NotificationConstants.Group.TWEETS.get())
                 .extend(createActionExtender(context, tweet))
+                .setDeleteIntent(getPendingIntentForService(context, tweet, "NOTIF"))
                 .build();
+    }
+
+    private static PendingIntent getPendingIntentForService(final Context context,
+                                                            final Tweet tweet, final String action) {
+        final Intent serviceIntent = new Intent(context, TweetWearService.class)
+                .setAction(action);
+        serviceIntent.putExtra(Constants.EXTRA_TWEET_ID, tweet.getId());
+        return PendingIntent.getService(
+                context, (int) tweet.getId(), serviceIntent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     private static Spanned getHtmlContent(final String rawContent, final String username,

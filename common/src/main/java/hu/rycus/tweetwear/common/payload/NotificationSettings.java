@@ -16,4 +16,10 @@ public class NotificationSettings {
         return Mapper.readObject(data, NotificationSettings.class);
     }
 
+    public static NotificationSettings getDefault() {
+        final NotificationSettings settings = new NotificationSettings();
+        settings.setVibrate(true);
+        return settings;
+    }
+
 }

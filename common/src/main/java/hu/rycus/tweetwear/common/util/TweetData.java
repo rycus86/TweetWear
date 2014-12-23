@@ -46,6 +46,12 @@ public final class TweetData {
         return new TweetData(tweet);
     }
 
+    public static TweetData forId(final long id) {
+        final Tweet tweet = new Tweet();
+        tweet.setId(id);
+        return TweetData.of(tweet);
+    }
+
     public static Tweet parse(final byte[] data) {
         return Mapper.readObject(data, Tweet.class);
     }
@@ -81,6 +87,7 @@ public final class TweetData {
 
     public byte[] serialize() {
         if (tweet != null) {
+            checkIncompleteTweet();
             return Mapper.writeObject(tweet);
         } else {
             return null;
@@ -89,6 +96,7 @@ public final class TweetData {
 
     public String toJson() {
         if (tweet != null) {
+            checkIncompleteTweet();
             return Mapper.writeObjectAsString(tweet);
         } else {
             return null;
@@ -96,6 +104,8 @@ public final class TweetData {
     }
 
     public String getTitle() {
+        checkIncompleteTweet();
+
         if (tweet.getRetweetedStatus() != null) {
             return "@" + tweet.getRetweetedStatus().getUser().getScreenName();
         } else {
@@ -104,12 +114,16 @@ public final class TweetData {
     }
 
     public String getTimestamp() {
+        checkIncompleteTweet();
+
         final DateFormat dateFormat =
                 DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
         return dateFormat.format(tweet.getCreatedAt());
     }
 
     public String toFormattedHtml() {
+        checkIncompleteTweet();
+
         String content = tweet.getText();
         if (tweet.getEntities() != null) {
             content = processEntities(content);
@@ -118,6 +132,8 @@ public final class TweetData {
     }
 
     private String processEntities(final String originalContent) {
+        checkIncompleteTweet();
+
         final Entities entities = tweet.getEntities();
 
         String content = originalContent;
@@ -171,6 +187,8 @@ public final class TweetData {
     }
 
     private PendingResult<DataApi.DataItemResult> send(final GoogleApiClient apiClient) {
+        checkIncompleteTweet();
+
         final PutDataMapRequest mapRequest = PutDataMapRequest.create(
                 Constants.DataPath.TWEETS.withId(tweet.getId()));
         mapRequest.getDataMap().putByteArray(
@@ -217,6 +235,12 @@ public final class TweetData {
             }
         }
     };
+
+    private void checkIncompleteTweet() {
+        if (tweet instanceof IncompleteTweet) {
+            throw new IllegalArgumentException("Can not process an incomplete tweet");
+        }
+    }
 
     public static Tweet demo(final long id) {
         final Tweet tweet = new Tweet();
@@ -268,6 +292,9 @@ public final class TweetData {
                         media1.getUrl(), media2.getUrl()));
 
         return tweet;
+    }
+
+    private static class IncompleteTweet extends Tweet {
     }
 
 }

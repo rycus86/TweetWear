@@ -8,11 +8,15 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.text.Html;
 
+import org.scribe.model.Token;
+
 import hu.rycus.tweetwear.BuildConfig;
 import hu.rycus.tweetwear.R;
 import hu.rycus.tweetwear.SyncService;
 import hu.rycus.tweetwear.preferences.ListSettings;
 import hu.rycus.tweetwear.preferences.Preferences;
+import hu.rycus.tweetwear.twitter.TwitterFactory;
+import hu.rycus.tweetwear.twitter.client.StreamingClient;
 
 public class SettingsHelper {
 
@@ -28,6 +32,32 @@ public class SettingsHelper {
 
     public static Preference findAccountInfo(final PreferenceActivity activity) {
         return findPreferenceItem(activity, KEY_ACCOUNT_INFO);
+    }
+
+    public static void TODO$remove$setupTests(final PreferenceActivity activity) {
+        final Token token = null; // TODO use existing token
+
+        findPreferenceItem(activity, "test_stream_start").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                SyncService.startStreaming(activity);
+                return true;
+            }
+        });
+        findPreferenceItem(activity, "test_stream_stop").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                SyncService.stopStreaming(activity);
+                return true;
+            }
+        });
+        findPreferenceItem(activity, "test_stream_abort").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(final Preference preference) {
+                ((StreamingClient) TwitterFactory.streamingClient()).test$abortStreaming(token);
+                return true;
+            }
+        });
     }
 
     public static void setupLists(final PreferenceActivity activity) {

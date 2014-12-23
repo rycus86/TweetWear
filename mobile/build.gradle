@@ -14,8 +14,8 @@ android {
         applicationId "hu.rycus.tweetwear"
         minSdkVersion 18
         targetSdkVersion 20
-        versionCode 13
-        versionName "0.4.3"
+        versionCode 14
+        versionName "0.5.1"
     }
     buildTypes {
         debug {
@@ -27,14 +27,16 @@ android {
             buildConfigField "String", "API_KEY", properties.getProperty('api.key')
             buildConfigField "String", "API_SECRET", properties.getProperty('api.secret')
 
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    /*
     packagingOptions {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
     }
+    */
 }
 
 apply plugin: 'android-unit-test'
@@ -49,6 +51,6 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.3.4'
     compile project(':common')
     testCompile 'junit:junit:4.10'
-    testCompile 'org.robolectric:robolectric:2.3'
+    testCompile 'org.robolectric:robolectric:2.4'
     testCompile 'org.mockito:mockito-all:1.9.5'
 }

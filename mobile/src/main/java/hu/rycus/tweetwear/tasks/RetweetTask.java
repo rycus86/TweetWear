@@ -34,7 +34,7 @@ public class RetweetTask extends ApiClientRunnable {
 
     private Tweet processRetweet(final Context context, final GoogleApiClient apiClient) {
         final Token accessToken = Preferences.getUserToken(context);
-        final Tweet tweet = TwitterFactory.createClient().retweet(accessToken, tweetId, null);
+        final Tweet tweet = TwitterFactory.restClient().retweet(accessToken, tweetId, null);
 
         if (tweet != null) {
             final Tweet retweeted = tweet.getRetweetedStatus();

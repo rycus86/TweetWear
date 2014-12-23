@@ -169,7 +169,7 @@ public class ListAdapter extends BaseAdapter {
                 @Override
                 protected Lists doInBackground(final Long... params) {
                     final Long cursor = params[0];
-                    return TwitterFactory.createClient()
+                    return TwitterFactory.restClient()
                             .getLists(context, listType, cursor, Lists.MAX_COUNT);
                 }
 

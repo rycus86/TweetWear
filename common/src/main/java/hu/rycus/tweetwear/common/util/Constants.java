@@ -15,6 +15,8 @@ public interface Constants {
     String ACTION_CAPTURE_REPLY = PACKAGE_NAME + ".CaptureReply";
     String ACTION_MARK_AS_READ = PACKAGE_NAME + ".MarkAsRead";
     String ACTION_READ_IT_LATER = PACKAGE_NAME + ".ReadItLater";
+    String ACTION_START_STREAMING = PACKAGE_NAME + ".StartStreaming";
+    String ACTION_STOP_STREAMING = PACKAGE_NAME + ".StopStreaming";
     String ACTION_DO_NOTHING = PACKAGE_NAME + ".DoNothing";
 
     String ACTION_BROADCAST_READ_IT_LATER = PACKAGE_NAME + ".Broadcast.ReadItLater";
@@ -51,6 +53,8 @@ public interface Constants {
 
         SYNC_COMPLETE("/sync/complete"),
         TWEETS("/tweets/%"),
+        TWEET_RECEIVED("/tweet/receive/%"),
+        TWEET_DELETE("/tweet/delete/%"),
         RETWEET("/retweet/%"),
         FAVORITE("/favorite/%"),
         POST_NEW_TWEET("/post/new/tweet"),

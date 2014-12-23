@@ -35,7 +35,7 @@ public class FavoriteTask extends ApiClientRunnable {
 
     private Tweet processFavorite(final Context context, final GoogleApiClient apiClient) {
         final Token accessToken = Preferences.getUserToken(context);
-        final ITwitterClient client = TwitterFactory.createClient();
+        final ITwitterClient client = TwitterFactory.restClient();
         final Tweet tweet = client.favorite(accessToken, tweetId, null);
 
         if (tweet != null) {

@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import org.scribe.model.Token;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -64,6 +66,10 @@ public class SyncService extends Service {
                 requestFetchTweets();
             } else if (Constants.ACTION_CLEAR_EXISTING.equals(intent.getAction())) {
                 requestClearExistingTweets();
+            } else if (Constants.ACTION_START_STREAMING.equals(intent.getAction())) {
+                requestStartStreaming();
+            } else if (Constants.ACTION_STOP_STREAMING.equals(intent.getAction())) {
+                requestStopStreaming();
             } else {
                 return super.onStartCommand(intent, flags, startId);
             }
@@ -97,12 +103,28 @@ public class SyncService extends Service {
 
     private void requestFetchTweets() {
         final IAccountProvider provider = TwitterFactory.createProvider();
-        final ITwitterClient twitterClient = TwitterFactory.createClient();
+        final ITwitterClient twitterClient = TwitterFactory.restClient();
         ApiClientHelper.runAsynchronously(this, new FetchTweetsTask(provider, twitterClient));
     }
 
     private void requestClearExistingTweets() {
         ApiClientHelper.runAsynchronously(this, new ClearExistingTweetsTask(false));
+    }
+
+    private void requestStartStreaming() {
+        final IAccountProvider provider = TwitterFactory.createProvider();
+        for (final Account account : provider.getAccounts(this)) {
+            final Token token = account.getAccessToken();
+            TwitterFactory.streamingClient().streamTimeline(this, token);
+        }
+    }
+
+    private void requestStopStreaming() {
+        final IAccountProvider provider = TwitterFactory.createProvider();
+        for (final Account account : provider.getAccounts(this)) {
+            final Token token = account.getAccessToken();
+            TwitterFactory.streamingClient().stopTimelineStreaming(token);
+        }
     }
 
     public static void scheduleSync(final Context context) {
@@ -128,6 +150,16 @@ public class SyncService extends Service {
 
     public static void clearExisting(final Context context) {
         final Intent intent = createIntent(context, Constants.ACTION_CLEAR_EXISTING);
+        context.startService(intent);
+    }
+
+    public static void startStreaming(final Context context) {
+        final Intent intent = createIntent(context, Constants.ACTION_START_STREAMING);
+        context.startService(intent);
+    }
+
+    public static void stopStreaming(final Context context) {
+        final Intent intent = createIntent(context, Constants.ACTION_STOP_STREAMING);
         context.startService(intent);
     }
 

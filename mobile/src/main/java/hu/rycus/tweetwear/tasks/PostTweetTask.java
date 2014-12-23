@@ -43,7 +43,7 @@ public class PostTweetTask extends ApiClientRunnable {
     private Tweet processTask(final Context context, final GoogleApiClient apiClient) {
         final Token token = Preferences.getUserToken(context);
         final Long inReplyToId = mode == Mode.REPLY ? originalTweetId : null;
-        final Tweet tweet = TwitterFactory.createClient().postStatus(token, content, inReplyToId);
+        final Tweet tweet = TwitterFactory.restClient().postStatus(token, content, inReplyToId);
         if (tweet != null) {
             tweet.setOwnTweet(true);
 
