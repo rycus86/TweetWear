@@ -12,7 +12,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.wearable.view.CardFrame;
 import android.support.wearable.view.CardScrollView;
 import android.support.wearable.view.DelayedConfirmationView;
-import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -80,31 +79,21 @@ public class PostTweetActivity extends Activity
 
         handler = new Handler();
 
-        final WatchViewStub viewStub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        viewStub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(final WatchViewStub watchViewStub) {
-                onLayoutReady(watchViewStub);
-            }
-        });
-    }
-
-    private void onLayoutReady(final WatchViewStub watchViewStub) {
-        final CardScrollView scrollView = (CardScrollView) watchViewStub.findViewById(R.id.card_scroller);
+        final CardScrollView scrollView = (CardScrollView) findViewById(R.id.card_scroller);
         scrollView.setCardGravity(Gravity.BOTTOM);
 
-        final CardFrame cardFrame = (CardFrame) watchViewStub.findViewById(R.id.card_frame);
+        final CardFrame cardFrame = (CardFrame) findViewById(R.id.card_frame);
         cardFrame.setExpansionFactor(1f);
         cardFrame.setExpansionDirection(CardFrame.EXPAND_UP);
 
-        promptView = watchViewStub.findViewById(R.id.prompt);
-        mainContentView = watchViewStub.findViewById(R.id.main_content);
+        promptView = findViewById(R.id.prompt);
+        mainContentView = findViewById(R.id.main_content);
 
-        txtContent = (TextView) watchViewStub.findViewById(R.id.txt_content);
+        txtContent = (TextView) findViewById(R.id.txt_content);
         delayedConfirmationView =
-                (DelayedConfirmationView) watchViewStub.findViewById(R.id.delayed_confirmation);
+                (DelayedConfirmationView) findViewById(R.id.delayed_confirmation);
         delayedConfirmationView.setTotalTimeMs(5000L);
-        txtCancelLabel = (TextView) watchViewStub.findViewById(R.id.txt_cancel_notice);
+        txtCancelLabel = (TextView) findViewById(R.id.txt_cancel_notice);
 
         checkStartMode();
 
