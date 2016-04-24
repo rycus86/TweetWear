@@ -1,7 +1,5 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
 .DS_Store
 /build
 /api.properties
@@ -9,5 +7,6 @@
 /keys
 /bump_version.sh
 /change_version.sh
-/.idea/codeStyleSettings.xml
-/.idea/dictionaries
+.idea/
+*.iml
+*.apk
