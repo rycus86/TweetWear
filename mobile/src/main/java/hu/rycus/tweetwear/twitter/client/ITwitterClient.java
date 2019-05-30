@@ -47,7 +47,7 @@ public interface ITwitterClient {
 
     enum Uri {
 
-        CALLBACK("tweetwear://oauth_callback"),
+        CALLBACK("tweetwear://authorize"),
         TIMELINE("https://api.twitter.com/1.1/statuses/home_timeline.json"),
         RETWEET("https://api.twitter.com/1.1/statuses/retweet/%d.json"),
         FAVORITE("https://api.twitter.com/1.1/favorites/create.json"),

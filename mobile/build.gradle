@@ -8,7 +8,7 @@ properties.load(project.rootProject.file('api.properties').newDataInputStream())
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc3"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         applicationId "hu.rycus.tweetwear"
@@ -49,4 +49,5 @@ dependencies {
     testCompile 'junit:junit:4.10'
     testCompile 'org.robolectric:robolectric:2.3'
     testCompile 'org.mockito:mockito-all:1.9.5'
+    annotationProcessor "org.projectlombok:lombok:1.14.4"
 }

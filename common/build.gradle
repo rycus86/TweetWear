@@ -1,9 +1,8 @@
 apply plugin: 'com.android.library'
-apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24.0.0 rc3"
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 18
@@ -25,5 +24,5 @@ dependencies {
     compile 'com.fasterxml.jackson.core:jackson-databind:2.4.1'
     compile 'org.projectlombok:lombok:1.14.4'
     provided 'org.projectlombok:lombok:1.14.4'
-    apt "org.projectlombok:lombok:1.14.4"
+    annotationProcessor "org.projectlombok:lombok:1.14.4"
 }

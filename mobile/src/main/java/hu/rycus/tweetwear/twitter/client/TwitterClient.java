@@ -1,6 +1,7 @@
 package hu.rycus.tweetwear.twitter.client;
 
 import android.content.Context;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import org.scribe.builder.ServiceBuilder;
@@ -242,7 +243,8 @@ public class TwitterClient implements ITwitterClient {
         return new Tweet[0];
     }
 
-    private static OAuthService createOAuthService() {
+    @VisibleForTesting
+    static OAuthService createOAuthService() {
         return new ServiceBuilder()
                 .provider(TwitterApi.SSL.class)
                 .apiKey(BuildConfig.API_KEY)
