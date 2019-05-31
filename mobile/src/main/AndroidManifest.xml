@@ -29,7 +29,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="oauth_callback"
+                    android:host="authorize"
                     android:scheme="tweetwear" />
             </intent-filter>
         </activity>
